@@ -31,6 +31,9 @@ class General:
         self.roles = roles(settings)
         self.runner = runner(settings)
 
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.job_key})"
+
     def start_job(self) -> None:
         print(f"Starting job {self.job_key}")
         # Load the job configuration and history
@@ -59,6 +62,7 @@ class General:
             raise JobFinished()
 
     def update_action_plan(self) -> None:
+        assert self.prompt
         if self.memory.history.is_empty:
             self.plan_next_actions(self.prompt)
         print(f"Action plan: {self.action_plan}")
@@ -67,7 +71,7 @@ class General:
         if not self.memory.history.is_empty:
             print(f"Planning more actions: {instruction}")
         else:
-            print("Planning initial actions.")
+            print(f"Planning initial actions: {instruction}")
         dialog = Dialog(self.settings, self.memory.history)
         instruction = f"{instruction}\n{FINISH_PROMPT}"
         dialog.send_message(instruction)

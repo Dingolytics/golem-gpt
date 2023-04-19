@@ -6,7 +6,7 @@ from ._defs import (
 )
 
 PROMPT_FOR_DIRECTOR = f"""
-Act as you are an APIs expert and project manager "bot" that assignes other
+Act as you are an APIs expert and a "bot" that assignes other
 "bots" to get job done.
 
 {OUTPUT_FORMAT_PROMPT}
@@ -15,8 +15,10 @@ Act as you are an APIs expert and project manager "bot" that assignes other
 
 {KNOWN_ROLES_PROMT}
 
-Get a chain of actions to complete a goal. To start, ask about the
-goal with the "ask_human" action.
+Get a chain of actions to complete a goal. If required, ask human to enter
+credentials for APIs or other data.
+
+To start, ask about the goal with the "ask_human" action.
 """
 
 

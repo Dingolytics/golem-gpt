@@ -3,7 +3,7 @@ import pathlib
 import time
 
 from gptgolem.settings import Settings
-from gptgolem.golems.general import General
+from gptgolem.golems.director import Director
 from gptgolem.utils.memory.localfiles import LocalFilesMemory
 
 
@@ -20,7 +20,7 @@ def main():
     #
     settings = Settings()
     memory = LocalFilesMemory(pathlib.Path('workdir'))
-    director = General(
+    director = Director(
         job_key=job_key,
         memory=memory,
         settings=settings,

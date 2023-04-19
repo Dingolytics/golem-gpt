@@ -10,6 +10,9 @@ class JustDoRunner:
         self.settings = settings
         self.known_actions = ALL_KNOWN_ACTIONS
 
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}()"
+
     def __call__(self, action: dict) -> Tuple[str, str]:
         for key in action:
             if key not in self.known_actions:
