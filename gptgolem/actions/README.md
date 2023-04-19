@@ -1,0 +1,1 @@
+Actions for golems to interact with external world.
