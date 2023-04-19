@@ -1,6 +1,5 @@
 from pathlib import Path
 from json import load as json_load, dump as json_dump
-# from pprint import pprint
 from pydantic import BaseModel
 
 

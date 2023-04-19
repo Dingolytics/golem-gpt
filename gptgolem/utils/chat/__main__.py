@@ -2,9 +2,10 @@
 import argparse
 # import binascii
 import time
-from .history import History
-from .settings import Settings
+
+from gptgolem.settings import Settings
 from .dialog import Dialog
+from .history import History
 
 
 def main():

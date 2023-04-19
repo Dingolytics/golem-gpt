@@ -3,7 +3,7 @@ from ..http import http_request
 from .settings import Settings
 
 
-class Prompt:
+class ImagePrompt:
     def __init__(self, settings: Settings) -> None:
         """Initialize the prompt."""
         self.settings = settings

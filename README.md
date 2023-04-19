@@ -28,16 +28,16 @@ OPENAI_ORG_ID=...
 Usage
 -----
 
-Start a new chat:
+Start a new job:
 
 ```bash
-python -m chat
+python -m gptgolem
 ```
 
-Continue saved chat:
+Continue saved job:
 
 ```bash
-python -m chat -k <chat key>
+python -m gptgolem -j <job key>
 ```
 
-Terminate chat simply with ^C or empty input.
+Terminate simply with ^C or empty input.
