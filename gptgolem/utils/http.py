@@ -23,4 +23,4 @@ def http_request(
         if response.headers['content-type'] == 'application/json':
             return json_loads(response.data)
         return response.data
-    raise RuntimeError(f'HTTP request failed: {response}')
+    raise RuntimeError(f'HTTP request failed: {response.data}')

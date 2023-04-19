@@ -1,15 +1,12 @@
 from gptgolem.settings import Settings
-from gptgolem.actions import (
-    ask_human_action
-)
+from gptgolem.actions import ALL_KNOWN_ACTIONS
 
 
-class JustDoerRunner:
+class JustDoRunner:
+    """A naive runner that just does the specified action."""
     def __init__(self, settings: Settings):
         self.settings = settings
-        self.known_actions = {
-            'ask_human': ask_human_action,
-        }
+        self.known_actions = ALL_KNOWN_ACTIONS
 
     def __call__(self, action: dict) -> str:
         for key in action:

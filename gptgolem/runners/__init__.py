@@ -1,5 +1,5 @@
-from .justdoer import JustDoerRunner
+from .justdo import JustDoRunner
 
 __all__ = [
-    'JustDoerRunner',
+    'JustDoRunner',
 ]
