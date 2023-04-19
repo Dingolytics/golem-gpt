@@ -1,40 +1,35 @@
 from json import loads as json_loads
-
+from typing import Callable
 from gptgolem.settings import Settings
 from gptgolem.utils.memory.base import BaseMemory
 from gptgolem.utils.chat.dialog import Dialog
 from gptgolem.runners import JustDoRunner
 from gptgolem.actions import JobFinished
-from .defs import SYSTEM_PROMPT_FOR_GENERAL_DIRECTOR
+from ._defs import FINISH_PROMPT
 
 
-def load_experts(settings: Settings) -> dict:
+def load_roles(settings: Settings) -> dict:
     return {}
 
 
-def load_runners(settings: Settings) -> dict:
-    return {
-        'default': JustDoRunner(settings),
-    }
+def load_runner(settings: Settings) -> Callable:
+    return JustDoRunner(settings)
 
 
-def load_prompt(settings: Settings) -> str:
-    return SYSTEM_PROMPT_FOR_GENERAL_DIRECTOR
+class General:
+    prompt = ''
 
-
-class Director:
     def __init__(
         self, *, job_key: str, memory: BaseMemory, settings: Settings,
-        experts = load_experts, runners = load_runners, prompt = load_prompt,
+        roles = load_roles, runner = load_runner
     ) -> None:
         self.job_key = job_key
         self.memory = memory
         self.settings = settings
         self.completed = []
         self.action_plan = []
-        self.experts = experts(settings)
-        self.runners = runners(settings)
-        self.prompt = prompt(settings).strip()
+        self.roles = roles(settings)
+        self.runner = runner(settings)
 
     def start_job(self) -> None:
         print(f"Starting job {self.job_key}")
@@ -54,15 +49,12 @@ class Director:
 
     def run_next_action(self) -> None:
         if self.action_plan:
-            action = self.action_plan.pop(0)
-            for runner_type, runner in self.runners.items():
-                print(f"Try running action: {action} with {runner_type}")
-                result = runner(action)
-                print(f"Action result: {result}")
-                if result:
-                    break
+            action_item = self.action_plan.pop(0)
+            print(f"Try running action: {action_item} with {self.runner}")
+            action, result = self.runner(action_item)
+            print(f"Action result: {result}")
             if result and not self.action_plan:
-                self.plan_next_actions(result)
+                self.plan_next_actions(f"Output of '{action}()': {result}")
         else:
             raise JobFinished()
 
@@ -77,7 +69,7 @@ class Director:
         else:
             print("Planning initial actions.")
         dialog = Dialog(self.settings, self.memory.history)
-        instruction = f"{instruction}\n If job is finished, say 'finish_job'."
+        instruction = f"{instruction}\n{FINISH_PROMPT}"
         dialog.send_message(instruction)
         reply = dialog.get_last_message()
         print(f"Parsing action plan: {reply}")
