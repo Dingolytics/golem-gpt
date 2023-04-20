@@ -1,4 +1,4 @@
-GPT Golem
+Golem-GPT 
 =========
 
 Golem powered by OpenAI GPT.
