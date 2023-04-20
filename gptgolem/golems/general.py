@@ -4,7 +4,7 @@ from gptgolem.settings import Settings
 from gptgolem.utils.memory.base import BaseMemory
 from gptgolem.utils.chat.dialog import Dialog
 from gptgolem.runners import JustDoRunner
-from gptgolem.actions import JobFinished
+from gptgolem.actions import JobFinished, JobRejected
 from ._defs import FINISH_CHECK_PROMPT
 
 
@@ -35,24 +35,44 @@ class General:
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.job_key})"
 
+    def syncronize(self) -> None:
+        print(f"Syncing job state with memory: {self.job_key}")
+        if self.memory.is_history_empty:
+            self.memory.load(self.job_key)
+
+        if self.goals:
+            self.memory.goals = self.goals
+        else:
+            self.goals = self.memory.goals
+            assert self.goals, "Goals not provided, and not found in memory"
+
+        self.memory.save()
+
     def start_job(self) -> None:
-        print(f"Starting job {self.job_key}")
-        # Load the job configuration and history
-        self.memory.load(self.job_key)
-        if not self.memory.history:
-            print("No history found")
-        # Validate the action plan and perform the actions
+        print(f"Starting job: {self.job_key}")
+        self.syncronize()
+        prompt = self.get_initial_prompt()
         while True:
             try:
-                self.update_action_plan()
-                self.run_next_action()
+                self.plan_next_actions(prompt)
+                prompt = self.run_next_action()
             except JobFinished:
                 break
-        # Mark the job as completed
+            except JobRejected:
+                break
         print(f"Job {self.job_key} completed")
 
     def get_initial_prompt(self) -> List[str]:
         return f"{self.prompt}\nThe goal is: {self.goals[-1]}"
+
+    def plan_next_actions(self, prompt: str) -> None:
+        print(f"Planning next actions:\n{prompt}")
+        dialog = Dialog(self.settings, self.memory)
+        dialog.send_message(f"{prompt}\n{FINISH_CHECK_PROMPT}")
+        reply = dialog.get_last_message()
+        print(f"Parsing action plan: {reply}")
+        self.action_plan = json_loads(reply)
+        self.memory.save()
 
     def run_next_action(self) -> None:
         if self.action_plan:
@@ -65,19 +85,4 @@ class General:
         else:
             raise JobFinished()
 
-    def update_action_plan(self) -> None:
-        assert self.prompt
-        if self.memory.history.is_empty:
-            self.plan_next_actions(self.get_initial_prompt())
-        print(f"Action plan: {self.action_plan}")
-
-    def plan_next_actions(self, prompt: str) -> None:
-        if not self.memory.history.is_empty:
-            print(f"Planning more actions: {prompt}")
-        else:
-            print(f"Planning initial actions: {prompt}")
-        dialog = Dialog(self.settings, self.memory.history)
-        dialog.send_message(f"{prompt}\n{FINISH_CHECK_PROMPT}")
-        reply = dialog.get_last_message()
-        print(f"Parsing action plan: {reply}")
-        self.action_plan = json_loads(reply)
+# TODO: review_action_plan explicitly?

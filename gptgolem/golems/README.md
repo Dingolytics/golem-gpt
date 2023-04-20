@@ -1,1 +1,0 @@
-Expertize areas for golems.
