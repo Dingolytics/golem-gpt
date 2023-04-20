@@ -5,12 +5,14 @@ You can use the following actions, higher in the list means the higher priority:
 - write_file(path, content)
 - read_file(path)
 - get_datetime()
+- human_input(text)
 - ask_golem(role, subgoal)
 - ask_google(text)
-- ask_human(text)
 - finish_job(message)
 
 Always use "http_api_request" instead of asking, if possible.
+After "ask_golem" or "ask_google" terminate the actions chain
+to refine later based on results.
 
 Always find a corresponding actions from the list above.
 """.strip()
@@ -33,8 +35,12 @@ so robots can understand you. Never answer with a plain text.
 
 Format:
 
-[ {"action_1": {"parameters1": "value1"}},
-  {"action_2": {"parameters2": "value2"}} ]
+[{"action_1": {"parameters1": "value1"}}]
 """.strip()
 
-FINISH_PROMPT = "If job is finished, say 'finish_job'."
+FINISH_CHECK_PROMPT = "If job is finished, say 'finish_job'."
+
+
+# [ {"action_1": {"parameters1": "value1"}},
+#   {"action_2": {"parameters2": "value2"}} ]
+# """.strip()

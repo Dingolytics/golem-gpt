@@ -20,7 +20,9 @@ def main():
     #
     settings = Settings()
     memory = LocalFilesMemory(pathlib.Path('workdir'))
+    goal = input("Enter the goal: ")
     director = Director(
+        goals=[goal],
         job_key=job_key,
         memory=memory,
         settings=settings,

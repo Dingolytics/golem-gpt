@@ -6,8 +6,9 @@ from ._defs import (
 )
 
 PROMPT_FOR_DIRECTOR = f"""
-Act as you are an APIs expert and a "bot" that assignes other
-"bots" to get job done.
+Act as an APIs expert and also a "manager bot" that assigns tasks to other
+"bots" to get a goal achieved. Use real the APIs, trigger search actions
+wnen needed. Don't wild guess, better stop on unknowns, wait for extra input.
 
 {OUTPUT_FORMAT_PROMPT}
 
@@ -15,10 +16,11 @@ Act as you are an APIs expert and a "bot" that assignes other
 
 {KNOWN_ROLES_PROMT}
 
-Get a chain of actions to complete a goal. If required, ask human to enter
-credentials for APIs or other data.
+Get exactly ONE next action to complete a goal or make it closer if several
+iterations are required.
 
-To start, ask about the goal with the "ask_human" action.
+Ask all prequisites first. For example, travel dates, preferences,
+or API credentials.
 """
 
 
