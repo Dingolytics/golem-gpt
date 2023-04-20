@@ -41,11 +41,10 @@ def main():
     memory.load(job_key)
     goals = memory.goals
 
-    while True:
+    while not goals:
         goal = input("Enter a goal for the Golem-GPT:\n?> ").strip()
         if goal:
             goals.append(goal)
-            break
 
     director = Director(
         goals=goals,
