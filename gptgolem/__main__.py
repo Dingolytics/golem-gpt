@@ -33,7 +33,7 @@ def main():
     console.info(f"Job key: {job_key}")
 
     settings = Settings()
-    workdir = settings.WORKDIR
+    workdir = settings.WORKDIR.absolute()
     outdir = workdir / job_key / 'output'
     outdir.mkdir(parents=True, exist_ok=True)
 

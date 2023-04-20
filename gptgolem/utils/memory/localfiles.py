@@ -33,7 +33,7 @@ class LocalFilesMemory(BaseMemory):
         path = self.root_dir / self.key / filename
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open('w') as file:
-            json_dump(data, file)
+            json_dump(data, file, indent=2, ensure_ascii=False)
 
     def load_messages(self) -> list:
         """Load the chat history from a local file."""
