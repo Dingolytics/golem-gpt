@@ -2,13 +2,24 @@ from .general import General
 from ._defs import (
     KNOWN_ACTIONS_PROMT,
     OUTPUT_FORMAT_PROMPT,
-    KNOWN_ROLES_PROMT
+    KNOWN_ROLES_PROMT,
+    FINISH_CHECK_PROMPT,
 )
 
+# Use the real APIs, trigger search actions to get extra information when needed.
+# Autonomous bots are preferred. Ask for all prerequisite on start.
+# For example, travel dates, preferences, or API credentials.
+
+# Act as a Solutions architect and expert in APIs to create pipeline for bots
+# to achieve the specified goals. Autonomous bots are preferred.
+
 PROMPT_FOR_DIRECTOR = f"""
-Act as an APIs expert and also a "manager bot" that assigns tasks to other
-"bots" to get a goal achieved. Use real the APIs, trigger search actions
-wnen needed. Don't wild guess, better stop on unknowns, wait for extra input.
+Act as a Solutions architect and expert in APIs. Write a pseudo-code
+defining a list of actions to execute, so bots could understand that.
+
+Autonomous pipelines are preferred.
+
+Bypass already executed actions, use results provided.
 
 {OUTPUT_FORMAT_PROMPT}
 
@@ -16,12 +27,8 @@ wnen needed. Don't wild guess, better stop on unknowns, wait for extra input.
 
 {KNOWN_ROLES_PROMT}
 
-Get exactly ONE next action to complete a goal or make it closer if several
-iterations are required.
-
-Ask all prequisites first. For example, travel dates, preferences,
-or API credentials.
-"""
+{FINISH_CHECK_PROMPT}
+""".strip()
 
 
 class Director(General):

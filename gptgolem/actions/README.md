@@ -6,7 +6,7 @@ human_input(query)
 read_file(filename)
 -> read results, review
 
-write_file(filename, contents)
+write_file(filename, content)
 -> write results, review
 
 http_request(url, method, headers, body, to_filename)

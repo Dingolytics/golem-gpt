@@ -1,3 +1,4 @@
 urllib3~=1.26.15
 pydantic~=1.10.7
 python-dotenv~=1.0.0
+termcolor~=2.2.0

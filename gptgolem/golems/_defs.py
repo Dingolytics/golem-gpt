@@ -1,20 +1,21 @@
 KNOWN_ACTIONS_PROMT = """
-You can use the following actions, higher in the list means the higher priority:
+You can use the following actions, higher in the list means
+the higher priority:
 
 - ask_human_input(query)
+- get_datetime()
+- get_datetime_local()
 - read_file(filename)
-- write_file(filename, contents)
+- write_file(filename, content)
 - http_request(url, method, headers, body, to_filename)
 - create_python_script(name, description, in_files, out_files)
 - create_shell_script(name, description, in_files, out_files)
 - run_script(name)
 - ask_google(query, to_filename)
 - delegate_job(goal, role, in_files, out_files)
-- explain(description)
+- explain(comment)
 - reject_job(message)
 - finish_job(message)
-
-Use explain() action to briefly describe what you are doing.
 
 Always find a corresponding actions from the list above.
 """.strip()
@@ -41,12 +42,15 @@ When using a the "delegate_job" action, assume the following roles:
 # """.strip()
 
 OUTPUT_FORMAT_PROMPT = """
-Write a pseudo-code for the job as a list of actions, so bots
-could understand you. Never answer with a plain text.
+Always use machine readable JSON for every response, use
+the "explain()" action to add comments.
 
 Format:
 
-[{"action_1": {"parameters1": "value1"}}]
+[{"write_file": {"filename": "hello.txt", "content": "Hello there."}}]
 """.strip()
 
-FINISH_CHECK_PROMPT = "Check if job is finished. If OK, say 'finish_job'."
+FINISH_CHECK_PROMPT = """
+Check if job is completed after each action and respond with "finish_job()"
+on success.
+""".strip()

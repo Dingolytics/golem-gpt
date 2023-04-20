@@ -18,13 +18,14 @@ class Dialog:
         self.memory = memory
 
     def send_message(
-        self, content, temperature: float = 0.2, max_tokens: int = 0
+        self, content, temperature: float = 0.1, role: str = 'user',
+        max_tokens: int = 0
     ) -> Tuple[str, list]:
         """Send a message to the dialog and return the reply."""
         # TODO: Store the chat ID in the memory.
         # TODO: Store more messages context in the memory.
         messages = self.memory.messages.copy()
-        messages.append({"role": "user", "content": content})
+        messages.append({"role": role, "content": content})
         payload = {
             'model': self.model,
             'messages': messages,

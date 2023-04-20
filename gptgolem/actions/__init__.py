@@ -57,6 +57,7 @@ ALL_KNOWN_ACTIONS = {
     'write_file': write_file_action,
     #
     'get_datetime': get_datetime_action,
+    'get_datetime_local': get_datetime_action,
     #
     'create_python_script': create_python_script_action,
     'create_shell_script': create_shell_script_action,

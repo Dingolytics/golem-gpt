@@ -1,11 +1,11 @@
 from json import loads as json_loads
 from typing import Callable, List
 from gptgolem.settings import Settings
+from gptgolem.utils import console
 from gptgolem.utils.memory.base import BaseMemory
 from gptgolem.utils.chat.dialog import Dialog
 from gptgolem.runners import JustDoRunner
 from gptgolem.actions import JobFinished, JobRejected
-from ._defs import FINISH_CHECK_PROMPT
 
 
 def load_roles(settings: Settings) -> dict:
@@ -36,7 +36,7 @@ class General:
         return f"{self.__class__.__name__}({self.job_key})"
 
     def syncronize(self) -> None:
-        print(f"Syncing job state with memory: {self.job_key}")
+        console.debug(f"Syncing job state with memory: {self.job_key}")
         if self.memory.is_history_empty:
             self.memory.load(self.job_key)
 
@@ -49,39 +49,46 @@ class General:
         self.memory.save()
 
     def start_job(self) -> None:
-        print(f"Starting job: {self.job_key}")
+        console.debug(f"Starting job: {self.job_key}")
         self.syncronize()
         prompt = self.get_initial_prompt()
         while True:
             try:
-                self.plan_next_actions(prompt)
+                if prompt:
+                    self.plan_next_actions(prompt)
                 prompt = self.run_next_action()
             except JobFinished:
                 break
             except JobRejected:
                 break
-        print(f"Job {self.job_key} completed")
+        console.debug(f"Job {self.job_key} completed")
 
     def get_initial_prompt(self) -> List[str]:
-        return f"{self.prompt}\nThe goal is: {self.goals[-1]}"
+        return f"{self.prompt}\n\nThe goal is: {self.goals[-1]}"
 
     def plan_next_actions(self, prompt: str) -> None:
-        print(f"Planning next actions:\n{prompt}")
+        # console.debug(f"Planning next actions after:\n{prompt}\n")
         dialog = Dialog(self.settings, self.memory)
-        dialog.send_message(f"{prompt}\n{FINISH_CHECK_PROMPT}")
+        console.message('user', prompt)
+        # role = 'system' if self.memory.is_history_empty else 'user'
+        dialog.send_message(prompt)
         reply = dialog.get_last_message()
-        print(f"Parsing action plan: {reply}")
+        console.message('golem', reply)
+        console.debug(f"Parsing action plan from reply:\n{reply}\n")
         self.action_plan = json_loads(reply)
         self.memory.save()
 
-    def run_next_action(self) -> None:
+    def run_next_action(self) -> str:
         if self.action_plan:
             action_item = self.action_plan.pop(0)
-            print(f"Try running action: {action_item} with {self.runner}")
+            # print(f"Try running action: {action_item} with {self.runner}")
             action, result = self.runner(action_item, golem=self)
-            print(f"Action result: {result}")
-            if result and not self.action_plan:
-                self.plan_next_actions(f"Output of '{action}()': {result}")
+            if not result:
+                return ''
+            return f"Completed {action}(), result: {result}"
+            # return f"Result of '{action}()': {result}"
+            # if result and not self.action_plan:
+            #     self.plan_next_actions(f"Output of '{action}()': {result}")
         else:
             raise JobFinished()
 

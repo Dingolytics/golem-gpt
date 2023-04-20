@@ -18,14 +18,14 @@ class LocalFilesMemory(BaseMemory):
         isinstance.load(key)
         return isinstance
 
-    def load_file(self, filename: str) -> list:
+    def load_file(self, filename: str, default: object) -> list:
         """Load JSON data from a local file."""
         assert self.key
         path = self.root_dir / self.key / filename
         if path.exists():
             with path.open() as file:
                 return json_load(file)
-        return []
+        return default
 
     def save_file(self, filename: str, data: object) -> None:
         """Save JSON data to a local file."""
@@ -37,7 +37,7 @@ class LocalFilesMemory(BaseMemory):
 
     def load_messages(self) -> list:
         """Load the chat history from a local file."""
-        return self.load_file('messages.json')
+        return self.load_file('messages.json', [])
 
     def save_messages(self) -> None:
         """Save the chat history to a local file."""
@@ -45,7 +45,7 @@ class LocalFilesMemory(BaseMemory):
 
     def load_goals(self) -> list:
         """Load the goals from a local file."""
-        return self.load_file('job.json').get('goals', [])
+        return self.load_file('job.json', {}).get('goals', [])
 
     def save_goals(self) -> None:
         """Save the goals to a local file."""
