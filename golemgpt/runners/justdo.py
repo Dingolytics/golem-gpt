@@ -1,6 +1,6 @@
 from typing import Any, Tuple
-from gptgolem.settings import Settings
-from gptgolem.actions import ALL_KNOWN_ACTIONS, UnknownAction
+from golemgpt.settings import Settings
+from golemgpt.actions import ALL_KNOWN_ACTIONS, UnknownAction
 
 
 class JustDoRunner:

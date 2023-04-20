@@ -1,4 +1,4 @@
-from gptgolem.utils.http import http_request
+from golemgpt.utils.http import http_request
 
 
 def ask_google_action(query: str, **kwargs):

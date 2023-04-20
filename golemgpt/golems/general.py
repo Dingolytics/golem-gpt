@@ -1,11 +1,11 @@
 from json import loads as json_loads
 from typing import Callable, List
-from gptgolem.settings import Settings
-from gptgolem.utils import console
-from gptgolem.utils.memory.base import BaseMemory
-from gptgolem.utils.chat.dialog import Dialog
-from gptgolem.runners import JustDoRunner
-from gptgolem.actions import JobFinished, JobRejected
+from golemgpt.settings import Settings
+from golemgpt.utils import console
+from golemgpt.utils.memory.base import BaseMemory
+from golemgpt.utils.chat.dialog import Dialog
+from golemgpt.runners import JustDoRunner
+from golemgpt.actions import JobFinished, JobRejected
 
 
 def load_roles(settings: Settings) -> dict:

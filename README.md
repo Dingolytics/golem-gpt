@@ -31,13 +31,13 @@ Usage
 Start a new job:
 
 ```bash
-python -m gptgolem
+python -m golemgpt
 ```
 
 Continue saved job:
 
 ```bash
-python -m gptgolem -j <job key>
+python -m golemgpt -j <job key>
 ```
 
 Terminate simply with ^C or empty input.

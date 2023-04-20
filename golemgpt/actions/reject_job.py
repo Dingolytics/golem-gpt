@@ -1,4 +1,4 @@
-from gptgolem.utils import console
+from golemgpt.utils import console
 
 
 class JobRejected(Exception):

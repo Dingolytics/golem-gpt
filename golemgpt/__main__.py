@@ -4,10 +4,10 @@ import contextlib
 import time
 import readline  # noqa
 
-from gptgolem.settings import Settings
-from gptgolem.golems.director import Director
-from gptgolem.utils.memory.localfiles import LocalFilesMemory
-from gptgolem.utils import console
+from golemgpt.settings import Settings
+from golemgpt.golems.director import Director
+from golemgpt.utils.memory.localfiles import LocalFilesMemory
+from golemgpt.utils import console
 
 
 @contextlib.contextmanager
