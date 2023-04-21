@@ -1,7 +1,7 @@
 from golemgpt.utils import console
 
 
-def explain_action(**kwargs) -> str:
+def explain_action(comment, **kwargs) -> str:
     """Explain the job and return its description."""
-    console.debug("Explanation: {kwargs}")
+    console.debug("Explanation: {comment}")
     return ''

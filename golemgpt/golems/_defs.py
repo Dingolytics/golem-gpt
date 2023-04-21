@@ -2,20 +2,20 @@ KNOWN_ACTIONS_PROMT = """
 You can use the following actions, higher in the list means
 the higher priority:
 
-- ask_human_input(query)
-- get_datetime()
-- get_datetime_local()
-- read_file(filename)
-- write_file(filename, content)
-- http_request(url, method, headers, body, to_filename)
-- create_python_script(name, description, in_files, out_files)
-- create_shell_script(name, description, in_files, out_files)
-- run_script(name)
-- ask_google(query, to_filename)
-- delegate_job(goal, role, in_files, out_files)
-- explain(comment)
-- reject_job(message)
-- finish_job(message)
+- ask_human_input: query
+- get_datetime: timezone
+- get_datetime_local:
+- read_file: filename
+- write_file: filename, content
+- http_request: url, method, headers, body, out_filename
+- create_python_script: name, description, in_files, out_files
+- create_shell_script: name, description, in_files, out_files
+- run_script: name
+- ask_google: query, out_filename
+- delegate_job: goal, role, in_files, out_files
+- explain: comment
+- reject_job: message
+- finish_job: message
 
 Always find a corresponding actions from the list above.
 """.strip()
@@ -42,15 +42,22 @@ When using a the "delegate_job" action, assume the following roles:
 # """.strip()
 
 OUTPUT_FORMAT_PROMPT = """
-Always use machine readable JSON for every response, use
-the "explain()" action to add comments.
+Always use machine readable JSON for every response. Don't add preambles.
+Don't be verbose. Use the "explain" action to add thoughts, thanks, etc.
 
 Format:
 
-[{"write_file": {"filename": "hello.txt", "content": "Hello there."}}]
+[
+{"action_1": {"param_1": "value_1"}},
+{"write_file": {"filename": "hello.txt", "content": "Hello there."}}
+]
 """.strip()
 
 FINISH_CHECK_PROMPT = """
-Check if job is completed after each action and respond with "finish_job()"
+Check if job is completed after each action and respond with "finish_job"
 on success.
 """.strip()
+
+WRONG_FORMAT_PROMPT = """
+If finished, just use a single "finish_job" action.
+"""

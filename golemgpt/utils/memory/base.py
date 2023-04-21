@@ -7,7 +7,7 @@ class BaseMemory(BaseModel):
     messages: list = []
     config: dict = {}
 
-    def spawn(self, key: str) -> 'BaseModel':
+    def spawn(self, key: str) -> 'BaseMemory':
         """Spawn a fresh memory instance."""
         cls = self.__class__
         instance = cls(config=self.config)

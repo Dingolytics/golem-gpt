@@ -7,7 +7,7 @@ import readline  # noqa
 from golemgpt.settings import Settings
 from golemgpt.golems.director import Director
 from golemgpt.utils.memory.localfiles import LocalFilesMemory
-from golemgpt.utils import console
+from golemgpt.utils import console, genkey
 
 
 @contextlib.contextmanager
@@ -24,7 +24,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-j', '--job-key', metavar='JOB_KEY',
-        type=str, default=hex(int(time.time()))[2:],
+        type=str, default=genkey(),
         required=False
     )
     args = parser.parse_args()
