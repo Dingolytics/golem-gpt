@@ -8,7 +8,7 @@ def write_file_action(filename: str, content: str, **kwargs) -> str:
     """Write a file and return its info."""
     cwd, path = Path.cwd(), (Path.cwd() / filename)
     try:
-        path.relative_to(cwd)
+        relname = path.relative_to(cwd)
     except ValueError:
         return "Rejected, file is outside of working dir."
 
@@ -18,4 +18,4 @@ def write_file_action(filename: str, content: str, **kwargs) -> str:
     with path.open("w") as file:
         file.write(content)
 
-    return f"File {path} is saved."
+    return f'File "{relname}" is saved.'

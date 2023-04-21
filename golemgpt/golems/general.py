@@ -1,3 +1,4 @@
+from re import compile as re_compile, DOTALL
 from json import loads as json_loads, JSONDecodeError
 from typing import Callable, List
 from golemgpt.settings import Settings
@@ -19,6 +20,10 @@ def load_runner(settings: Settings) -> Callable:
 
 class General:
     prompt = ''
+    # Not-a-JSON naive preambule regex:
+    naive_preambule_re = re_compile(r'([^\[\{]+)', DOTALL)
+    # naive_list_re = re_compile(r'(\[[\s\S]+\])', DOTALL)
+    # naive_obj_re = re_compile(r'(\{[\s\S]+\})', DOTALL)
 
     # TODO: Implement review_action_plan() ?
     # TODO: Spawn a new Golem to make parseable action plan from the reply ?
@@ -91,16 +96,28 @@ class General:
         """Parse the reply into an action plan."""
         console.debug(f"Parse plan:\n{reply}\n")
         reply = reply.strip()
-        try:
-            self.action_plan = json_loads(reply)
-        except JSONDecodeError:
-            raise
-            # Try to parse the last line only
-            # lines = reply.splitlines()
-            # if len(lines) > 1:
-            #     self.parse_plan(lines.pop())
-            # else:
-            #     raise
+        parsed = json_loads(reply)
+        if isinstance(parsed, dict):
+            parsed = [parsed]
+        self.action_plan = parsed
+        # Reply might contain a preambule, try to extract the JSON only
+        # list_match = self.naive_list_re.search(reply)
+        # obj_match = self.naive_obj_re.search(reply)
+        # if list_match:
+        #     matched = list_match.group()
+        #     console.debug(f"List found: {matched}")
+        # elif obj_match:
+        #     matched = obj_match.group()
+        #     console.debug(f"Object found: {matched}")
+        #     matched = '[' + matched.lstrip('{').rstrip('}') + ']'
+        # else:
+        #     console.debug(f"No JSON found: {reply}")
+        #     raise JSONDecodeError("Not a JSON", reply, 0)
+        # Regex are greedy and matched part might be noisy
+        # try:
+        #     self.action_plan = json_loads(matched)
+        # except JSONDecodeError:
+        #     self.action_plan = json_loads(reply)
 
     def update_plan(self, prompt: str, attempt: int = 0) -> None:
         """Ask to update the plan based on the prompt."""
@@ -114,6 +131,9 @@ class General:
         try:
             self.parse_reply(reply)
         except JSONDecodeError:
+            preambule = self.naive_preambule_re.search(reply)
+            if preambule:
+                reply = preambule.group()
             question = (
                 "Does the following mean current job is finished"
                 f" (optional ask to start a new one)?\n\n{reply}"
@@ -129,6 +149,6 @@ class General:
             action, result = self.runner(action_item, golem=self)
             if not result:
                 return ''
-            return f'"{action}" completed, result: {result}'
+            return f'Completed "{action}" with result:\n{result}'
         else:
             raise JobFinished()

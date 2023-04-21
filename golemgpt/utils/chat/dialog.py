@@ -18,7 +18,7 @@ class Dialog:
         self.memory = memory
 
     def send_message(
-        self, content, temperature: float = 0.1, role: str = 'user',
+        self, content, temperature: float = 0, role: str = 'user',
         max_tokens: int = 0
     ) -> Tuple[str, list]:
         """Send a message to the dialog and return the reply."""
