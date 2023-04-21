@@ -1,3 +1,6 @@
+from json import JSONDecodeError
+
+
 class JobFinished(Exception):
     """Exception to be raised when the job is finished."""
 
@@ -19,3 +22,10 @@ class UnknownAction(RuntimeError):
     def __init__(self, name: str):
         self.name = name
         super().__init__(f"Unknown action: {name}.")
+
+
+class ParseActionsError(JSONDecodeError):
+    """Raised when actions plan cannot be parsed."""
+
+    def __init__(self, msg: str, doc: str, pos: int = 0):
+        super().__init__(msg, doc, pos)
