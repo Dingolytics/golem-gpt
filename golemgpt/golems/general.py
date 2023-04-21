@@ -1,5 +1,5 @@
 from re import compile as re_compile, DOTALL
-from json import loads as json_loads, JSONDecodeError
+from json import loads as json_loads, dumps as json_dumps, JSONDecodeError
 from typing import Callable, List
 from golemgpt.settings import Settings
 from golemgpt.utils import console, genkey
@@ -63,16 +63,28 @@ class General:
 
     def syncronize(self) -> None:
         console.debug(f"Syncing job state with memory: {self.job_key}")
-        if self.memory.is_history_empty:
-            self.memory.load(self.job_key)
+        self.memory.load(self.job_key)
 
-        if self.goals:
+        if self.memory.is_history_empty:
             self.memory.goals = self.goals
+            for message in self.get_initial_history():
+                self.memory.messages.append(message)
         else:
             self.goals = self.memory.goals
             assert self.goals, "Goals not provided, and not found in memory"
 
         self.memory.save()
+
+    def get_initial_history(self) -> list:
+        return [
+            {'role': 'user', 'content': self.prompt},
+            {'role': 'assistant', 'content': json_dumps([
+                {'ask_human_input': {'query': 'What is the goal?'}},
+            ])},
+        ]
+
+    def get_initial_prompt(self) -> List[str]:
+        return f"The goal is: {self.goals[-1]}"
 
     def start_job(self) -> None:
         console.info(f"Starting job: {self.job_key}")
@@ -88,9 +100,6 @@ class General:
             except JobRejected:
                 break
         console.info(f"Job {self.job_key} completed")
-
-    def get_initial_prompt(self) -> List[str]:
-        return f"{self.prompt}\n\nThe goal is: {self.goals[-1]}"
 
     def parse_reply(self, reply: str) -> List[dict]:
         """Parse the reply into an action plan."""

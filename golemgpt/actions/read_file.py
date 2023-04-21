@@ -5,14 +5,16 @@ MAX_SIZE = 2048
 
 def read_file_action(filename: str, **kwargs) -> str:
     """Read a file and return its content."""
-    cwd, path = Path.cwd(), Path(filename)
-    try:
-        path.relative_to(cwd)
-    except ValueError:
-        return "Rejected, file is outside of working dir."
+    cwd = Path.cwd().absolute()
+    path = Path(Path.cwd() / filename).absolute()
+
+    if cwd in path.parents:
+        relname = path.relative_to(cwd)
+    else:
+        return f"Rejected, file {filename} is outside of working dir."
 
     if not path.exists():
-        return "Rejected, file does not exist."
+        return f"Rejected, file {relname} does not exist."
 
     if path.stat().st_size > MAX_SIZE:
         return f"Rejected, file is large (max {MAX_SIZE})."
