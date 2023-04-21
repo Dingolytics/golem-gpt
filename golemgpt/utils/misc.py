@@ -1,7 +1,9 @@
+
 import time
 import random
 import string
 from pathlib import Path
+from .exceptions import PathRejected
 
 
 def genkey() -> str:
@@ -15,4 +17,4 @@ def workpath(relpath: str) -> Path:
     path = Path(Path.cwd() / relpath).absolute()
     if cwd in path.parents:
         return path
-    raise ValueError(f"File {relpath} is outside of working dir.")
+    raise PathRejected(relpath, f"File {relpath} is outside of working dir.")

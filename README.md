@@ -60,10 +60,10 @@ The pipeline consists of the following actions:
 
 - [x] ask_human_input(query)
 - [x] get_datetime()
-- [x] get_datetime_local()
+- [x] get_local_date()
 - [x] read_file(filename)
 - [x] write_file(filename, content)
-- [ ] http_request(url, method, headers, body, to_filename)
+- [x] http_request(url, method, headers, body, to_filename)
 - [ ] create_python_script(name, description, in_files, out_files)
 - [ ] create_shell_script(name, description, in_files, out_files)
 - [x] run_script(name)

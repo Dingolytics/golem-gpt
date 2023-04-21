@@ -30,6 +30,21 @@ def http_request_streamed(
     )
 
 
+def http_download(
+    method: str, url: str, path: str,
+    headers: Optional[Dict[str, str]] = None,
+    json: Optional[Any] = None, **kwargs: Any
+) -> urllib3.HTTPResponse:
+    """Download file via streamed HTTP request."""
+    response = http_request_streamed(
+        method=method, url=url, headers=headers, json=json, **kwargs
+    )
+    with open(path, 'wb') as file:
+        for chunk in response.stream():
+            file.write(chunk)
+    return response
+
+
 def http_request(
         method: str, url: str, headers: Optional[Dict[str, str]] = None,
         json: Optional[Any] = None, **kwargs: Any

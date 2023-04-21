@@ -1,22 +1,10 @@
-import os
 import argparse
-import contextlib
 import readline  # noqa
 
 from golemgpt.settings import Settings
 from golemgpt.golems.director import Director
 from golemgpt.utils.memory.localfiles import LocalFilesMemory
-from golemgpt.utils import console, genkey
-
-
-@contextlib.contextmanager
-def cd(path: str):
-   old = os.getcwd()
-   os.chdir(path)
-   try:
-       yield
-   finally:
-       os.chdir(old)
+from golemgpt.utils import chdir, console, genkey
 
 
 def main():
@@ -53,7 +41,7 @@ def main():
         memory=memory,
         settings=settings,
     )
-    with cd(outdir):
+    with chdir(outdir):
         director.start_job()
 
 

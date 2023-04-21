@@ -1,14 +1,17 @@
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 from golemgpt.settings import Settings
-from golemgpt.actions import ALL_KNOWN_ACTIONS, UnknownAction
+from golemgpt.utils.exceptions import UnknownAction
+from golemgpt.actions import ALL_KNOWN_ACTIONS
 
 
 class JustDoRunner:
     """A naive runner that just performs the specified action."""
 
-    def __init__(self, settings: Settings):
+    def __init__(
+        self, settings: Settings, known_actions: Optional[dict] = None
+    ) -> None:
         self.settings = settings
-        self.known_actions = ALL_KNOWN_ACTIONS
+        self.known_actions = known_actions or ALL_KNOWN_ACTIONS
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}()"

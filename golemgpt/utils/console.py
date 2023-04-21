@@ -2,10 +2,7 @@ from termcolor import cprint, colored
 
 _DEBUG = False
 
-_COLORS = [
-    'light_red', 'green', 'yellow', 'blue', 'light_magenta',
-    # 'grey', 'cyan',
-]
+_COLORS = ['light_red', 'green', 'yellow', 'blue', 'light_magenta']
 
 
 def set_debug(enabled: bool) -> None:

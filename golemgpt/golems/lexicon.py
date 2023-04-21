@@ -1,3 +1,42 @@
+from json import dumps as json_dumps
+
+
+class GeneralLexicon:
+    role_model_prompt: str = ""
+
+    def wrong_format_prompt(self) -> str:
+        return WRONG_FORMAT_PROMPT
+
+    def initializer_prompt(self) -> str:
+        return (
+            f"{self.role_model_prompt}\n\n"
+            f"{INSTRUCTIONAL_PROMPT}\n\n"
+            f"{OUTPUT_FORMAT_PROMPT}\n\n"
+            f"{KNOWN_ACTIONS_PROMT}\n\n"
+            f"{CHECK_COMPLETION_PROMPT}\n\n"
+        ).strip()
+
+    def initializer_history(self) -> list:
+        prompt = self.initializer_prompt()
+        reply = INITIALIZER_REPLY_EXAMPLE
+        return [
+            {'role': 'user', 'content': prompt},
+            {'role': 'assistant', 'content': reply},
+        ]
+
+
+INSTRUCTIONAL_PROMPT = """
+Write a pseudo-code defining a list of actions to execute, so bots could
+understand that. You provide a list of actions, bots will execute them
+and you will get results.
+
+Bypass already executed actions, use results provided.
+""".strip()
+
+INITIALIZER_REPLY_EXAMPLE = json_dumps([
+    {'ask_human_input': {'query': 'What is the goal?'}},
+]).strip()
+
 # - create_python_script: name, description, in_files, out_files
 # - create_shell_script: name, description, in_files, out_files
 # - delegate_job: goal, role, in_files, out_files
@@ -6,13 +45,14 @@ KNOWN_ACTIONS_PROMT = """
 You can use the following actions, higher in the list means
 the higher priority:
 
-- ask_human_input: query
-- get_datetime: timezone
-- get_datetime_local:
+- get_os_details:
+- get_local_date:
+- summarize_file: filename, hint, out_filename
 - read_file: filename
 - write_file: filename, content
-- http_request: url, method, headers, body, out_filename
+- http_download: url, method, headers, body, out_filename
 - run_script: name
+- ask_human_input: query
 - ask_google: query, out_filename
 - explain: comment
 - reject_job: message
@@ -47,11 +87,11 @@ Format:
 ]
 """.strip()
 
-FINISH_CHECK_PROMPT = """
+CHECK_COMPLETION_PROMPT = """
 Check if job is completed after each action and respond with "finish_job"
 on success.
 """.strip()
 
 WRONG_FORMAT_PROMPT = """
 If finished, just use a single "finish_job" action.
-"""
+""".strip()

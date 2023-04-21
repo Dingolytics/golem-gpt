@@ -1,6 +1,4 @@
-class JobFinished(Exception):
-    """Exception to be raised when the job is finished."""
-    pass
+from golemgpt.utils.exceptions import JobFinished
 
 
 def finish_job_action(**kwargs):

@@ -1,9 +1,5 @@
 from golemgpt.utils import console
-
-
-class JobRejected(Exception):
-    """Exception to be raised when the job is rejected."""
-    pass
+from golemgpt.utils.exceptions import JobRejected
 
 
 def reject_job_action(**kwargs) -> str:
