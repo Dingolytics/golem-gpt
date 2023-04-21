@@ -7,5 +7,6 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_ORG_ID: ${OPENAI_ORG_ID}
       WORKDIR: /var/app/workdir
+      GOLEM_DEBUG: ${GOLEM_DEBUG:-false}
     volumes:
       - ./workdir:/var/app/workdir

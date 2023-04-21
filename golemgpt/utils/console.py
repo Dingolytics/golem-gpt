@@ -1,9 +1,25 @@
 from termcolor import cprint, colored
 
+_DEBUG = False
 
-def message(author: str, text: str, color='white') -> None:
-    author = colored(author.upper(), 'magenta')
-    cprint(author + '\n' + text + '\n', color)
+_COLORS = [
+    'light_red', 'green', 'yellow', 'blue', 'light_magenta',
+    # 'grey', 'cyan',
+]
+
+
+def set_debug(enabled: bool) -> None:
+    global _DEBUG
+    _DEBUG = enabled
+
+
+def message(author: str, text: str) -> None:
+    author = author.upper()
+    idx = sum(ord(char) for char in author) % len(_COLORS)
+    author_color = _COLORS[idx]
+    cprint(colored(author, author_color, None, []))
+    print(text)
+    print('')
 
 
 def info(text: str) -> None:
@@ -11,5 +27,6 @@ def info(text: str) -> None:
 
 
 def debug(text: str, indent='    ') -> None:
-    indented = '\n'.join([f'{indent}{x}' for x in text.splitlines()])
-    cprint(indented, 'dark_grey')
+    if _DEBUG:
+        indented = '\n'.join([f'{indent}{x}' for x in text.splitlines()])
+        cprint(indented, 'grey')

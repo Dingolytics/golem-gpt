@@ -1,7 +1,6 @@
 import os
 import argparse
 import contextlib
-import time
 import readline  # noqa
 
 from golemgpt.settings import Settings
@@ -21,6 +20,9 @@ def cd(path: str):
 
 
 def main():
+    settings = Settings()
+    console.set_debug(settings.GOLEM_DEBUG)
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-j', '--job-key', metavar='JOB_KEY',
@@ -32,7 +34,6 @@ def main():
     job_key = args.job_key
     console.info(f"Job key: {job_key}")
 
-    settings = Settings()
     workdir = settings.WORKDIR.absolute()
     outdir = workdir / job_key / 'output'
     outdir.mkdir(parents=True, exist_ok=True)

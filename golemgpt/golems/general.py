@@ -21,7 +21,7 @@ def load_runner(settings: Settings) -> Callable:
 class General:
     prompt = ''
     # Not-a-JSON naive preambule regex:
-    naive_preambule_re = re_compile(r'([^\[\{]+)', DOTALL)
+    naive_preambule_re = re_compile(r'([^\[\{]*)', DOTALL)
     # naive_list_re = re_compile(r'(\[[\s\S]+\])', DOTALL)
     # naive_obj_re = re_compile(r'(\{[\s\S]+\})', DOTALL)
 
@@ -75,7 +75,7 @@ class General:
         self.memory.save()
 
     def start_job(self) -> None:
-        console.debug(f"Starting job: {self.job_key}")
+        console.info(f"Starting job: {self.job_key}")
         self.syncronize()
         prompt = self.get_initial_prompt()
         while True:
@@ -87,7 +87,7 @@ class General:
                 break
             except JobRejected:
                 break
-        console.debug(f"Job {self.job_key} completed")
+        console.info(f"Job {self.job_key} completed")
 
     def get_initial_prompt(self) -> List[str]:
         return f"{self.prompt}\n\nThe goal is: {self.goals[-1]}"
@@ -95,11 +95,19 @@ class General:
     def parse_reply(self, reply: str) -> List[dict]:
         """Parse the reply into an action plan."""
         console.debug(f"Parse plan:\n{reply}\n")
+        preambule = self.naive_preambule_re.search(reply)
+        if preambule:
+            preambule = preambule.group()
+            reply = reply[len(preambule):]
+            console.debug(f"Parse plan (trunc.):\n{reply}\n")
         reply = reply.strip()
-        parsed = json_loads(reply)
-        if isinstance(parsed, dict):
-            parsed = [parsed]
-        self.action_plan = parsed
+        if reply:
+            parsed = json_loads(reply)
+            if isinstance(parsed, dict):
+                parsed = [parsed]
+            self.action_plan = parsed
+        else:
+            raise JSONDecodeError("JSON not found", reply, 0)
         # Reply might contain a preambule, try to extract the JSON only
         # list_match = self.naive_list_re.search(reply)
         # obj_match = self.naive_obj_re.search(reply)
@@ -127,7 +135,7 @@ class General:
         dialog.send_message(prompt)
         reply = dialog.get_last_message()
         self.memory.save()
-        console.message('golem', reply)
+        console.message('golem-gpt', reply)
         try:
             self.parse_reply(reply)
         except JSONDecodeError:
