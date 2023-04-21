@@ -1,6 +1,6 @@
 from pathlib import Path
 
-MAX_SIZE = 2048
+MAX_SIZE = 8096
 
 
 def read_file_action(filename: str, **kwargs) -> str:
@@ -16,8 +16,9 @@ def read_file_action(filename: str, **kwargs) -> str:
     if not path.exists():
         return f"Rejected, file {relname} does not exist."
 
+    file_size = path.stat().st_size
     if path.stat().st_size > MAX_SIZE:
-        return f"Rejected, file is large (max {MAX_SIZE})."
+        return f"File exists, but is too large ({file_size} bytes)."
 
     with path.open("r") as file:
         return file.read()

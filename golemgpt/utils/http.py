@@ -5,19 +5,38 @@ import urllib3
 http = urllib3.PoolManager()
 
 
+def _do_request(
+    method: str, url: str, headers: Optional[Dict[str, str]] = None,
+    json: Optional[Any] = None, **kwargs: Any
+) -> urllib3.HTTPResponse:
+    """Send an HTTP request helper."""
+    if json:
+        headers = headers or {}
+        headers['content-type'] = 'application/json'
+        kwargs['body'] = json_dumps(json)
+    return http.request(
+        method=method, url=url, headers=headers, **kwargs
+    )
+
+
+def http_request_streamed(
+    method: str, url: str, headers: Optional[Dict[str, str]] = None,
+    json: Optional[Any] = None, **kwargs: Any
+) -> urllib3.HTTPResponse:
+    """Send an HTTP request without preloading, i.e. streamed."""
+    return _do_request(
+        method=method, url=url, headers=headers, json=json,
+        preload_content=False, **kwargs
+    )
+
+
 def http_request(
         method: str, url: str, headers: Optional[Dict[str, str]] = None,
         json: Optional[Any] = None, **kwargs: Any
     ) -> Union[Dict[str, Any], bytes]:
-    """Send an HTTP request."""
-    if json:
-        headers = headers or {}
-        headers['content-type'] = 'application/json'
-        body = json_dumps(json)
-    else:
-        body = None
-    response = http.request(
-        method=method, url=url, headers=headers, body=body, **kwargs
+    """Send an HTTP request and return parsed data."""
+    response = _do_request(
+        method=method, url=url, headers=headers, json=json, **kwargs
     )
     if response.status == 200:
         if response.headers['content-type'] == 'application/json':
