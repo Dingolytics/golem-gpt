@@ -38,10 +38,14 @@ class Dialog:
             headers=self.headers, json=payload
         )
         reply = result['choices'][0]['message']
-        # chat_id = result['id']
+
         messages.append(reply)
         self.memory.messages = messages
-        return '', messages
+        self.memory.save()
+
+        return self.get_last_message()
+        # chat_id = result['id']
+        # return '', messages
         # return (chat_id, messages)
 
     def get_last_message(self) -> str:

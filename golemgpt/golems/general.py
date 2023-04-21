@@ -42,8 +42,8 @@ class General:
         while True:
             try:
                 if outcome:
-                    self.plan_next_actions(outcome)
-                outcome = self.run_next_action()
+                    self.plan_actions(outcome)
+                outcome = self.run_action()
             except JobFinished:
                 break
             except JobRejected:
@@ -66,7 +66,7 @@ class General:
 
         self.memory.save()
 
-    def run_next_action(self) -> str:
+    def run_action(self) -> str:
         """Run the next action in the plan."""
         if not self.action_plan:
             raise JobFinished()
@@ -76,22 +76,20 @@ class General:
             return ''
         return self.lexicon.action_result_prompt(action, result)
 
-    def plan_next_actions(self, prompt: str, attempt: int = 0) -> None:
+    def plan_actions(self, prompt: str, attempt: int = 0) -> None:
         """Ask to update the plan based on the prompt."""
         console.message('user', prompt)
-        # TODO: Trigger memory save inside dialog
         dialog = Dialog(self.settings, self.memory)
-        dialog.send_message(prompt)
-        reply = dialog.get_last_message()
-        self.memory.save()
+        reply = dialog.send_message(prompt)
         console.message('golem-gpt', reply)
         try:
             self.action_plan = self.lexicon.parse_reply(reply)
         except ParseActionsError:
-            self.retry_plan_next_actions(reply, attempt + 1)
+            self.try_restore_plan(reply, attempt + 1)
 
-    def retry_plan_next_actions(self, reply: str, attempt: int = 0) -> None:
-        """Ask to retry the plan based on the reply."""
+    # TODO: Extract restore strategy to a separate class
+    def try_restore_plan(self, reply: str, attempt: int = 0) -> None:
+        """Try restore the plan after malformed reply."""
         # Finish if too many failed attempts:
         if attempt > RETRY_PLAN_MAX_ATTEMPTS:
             raise JobFinished()
@@ -103,18 +101,15 @@ class General:
 
         # Try to plan again after remainder about the format:
         remainder = self.lexicon.remind_format_prompt()
-        self.plan_next_actions(remainder, attempt + 1)
+        self.plan_actions(remainder, attempt + 1)
 
     # TODO: Extract side dialog to a separate class (1)
     def side_dialog(self, prompt: str) -> str:
         """Spawn a side dialog to interpret the mainline replies."""
         console.message('user', prompt)
         key = f'{self.job_key}.{genkey()}'
-        memory = self.memory.spawn(key)
-        dialog = Dialog(self.settings, memory)
-        dialog.send_message(prompt, temperature=0)
-        reply = dialog.get_last_message()
-        memory.save()
+        dialog = Dialog(self.settings, self.memory.spawn(key))
+        reply = dialog.send_message(prompt, temperature=0)
         console.message('quick', reply)
         return reply
 
