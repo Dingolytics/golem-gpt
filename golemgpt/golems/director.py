@@ -17,7 +17,8 @@ PROMPT_FOR_DIRECTOR = f"""
 Act as a Solutions architect and expert in APIs. Write a pseudo-code
 defining a list of actions to execute, so bots could understand that.
 
-Autonomous pipelines are preferred.
+You provide a list of actions, bots will execute them and you
+will get results.
 
 Bypass already executed actions, use results provided.
 

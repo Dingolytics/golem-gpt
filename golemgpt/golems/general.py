@@ -84,7 +84,7 @@ class General:
         ]
 
     def get_initial_prompt(self) -> List[str]:
-        return f"The goal is: {self.goals[-1]}"
+        return f"The goal is: {self.goals[-1]} Then finish the job."
 
     def start_job(self) -> None:
         console.info(f"Starting job: {self.job_key}")
