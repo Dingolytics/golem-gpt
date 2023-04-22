@@ -1,7 +1,7 @@
 from typing import Tuple
+from golemgpt.memory import BaseMemory
 from golemgpt.settings import Settings
 from golemgpt.utils.http import http_request
-from golemgpt.utils.memory import BaseMemory
 
 
 class Dialog:

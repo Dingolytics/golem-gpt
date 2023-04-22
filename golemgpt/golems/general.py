@@ -1,18 +1,18 @@
 from typing import List
-from golemgpt.settings import Settings
-from golemgpt.utils import console, genkey
-from golemgpt.utils.memory.base import BaseMemory
-from golemgpt.utils.dialog import Dialog
+from golemgpt.lexicon import GeneralLexicon
 from golemgpt.runners import JustDoRunner
+from golemgpt.settings import Settings
+from golemgpt.memory import BaseMemory
+from golemgpt.utils import console, genkey
+from golemgpt.utils.dialog import Dialog
 from golemgpt.utils.exceptions import (
     JobFinished, JobRejected, ParseActionsError
 )
-from .lexicon import GeneralLexicon
 
 RETRY_PLAN_MAX_ATTEMPTS = 3
 
 
-class General:
+class GeneralGolem:
     lexicon_class = GeneralLexicon
     runner_class = JustDoRunner
 

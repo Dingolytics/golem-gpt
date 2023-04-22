@@ -2,8 +2,8 @@ import argparse
 import readline  # noqa
 
 from golemgpt.settings import Settings
-from golemgpt.golems.director import Director
-from golemgpt.utils.memory.localfiles import LocalFilesMemory
+from golemgpt.memory.localfiles import LocalFilesMemory
+from golemgpt.golems.roles.director import DirectorGolem
 from golemgpt.utils import chdir, console, genkey
 
 
@@ -35,7 +35,7 @@ def main():
         if goal:
             goals.append(goal)
 
-    director = Director(
+    director = DirectorGolem(
         goals=goals,
         job_key=job_key,
         memory=memory,
