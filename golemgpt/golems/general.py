@@ -1,28 +1,35 @@
 from typing import List
-from golemgpt.settings import Settings
-from golemgpt.utils import console, genkey
-from golemgpt.utils.memory.base import BaseMemory
-from golemgpt.utils.dialog import Dialog
+from golemgpt.codex import BaseCodex
+# from golemgpt.codex import UnawareCodex
+from golemgpt.codex import ReasonableCodex
+from golemgpt.lexicon import GeneralLexicon
 from golemgpt.runners import JustDoRunner
+from golemgpt.settings import Settings
+from golemgpt.memory import BaseMemory
+from golemgpt.utils import console, genkey
+from golemgpt.cognitron.openai import OpenAICognitron
 from golemgpt.utils.exceptions import (
-    JobFinished, JobRejected, ParseActionsError
+    JobFinished, JobRejected, ParseActionsError, AlignAcionsError
 )
-from .lexicon import GeneralLexicon
 
-RETRY_PLAN_MAX_ATTEMPTS = 3
+DEFAULT_NAME = 'Golem-GPT'
+
+DEFAULT_RETRY_PLAN_ATTEMPTS = 3
 
 
-class General:
+class GeneralGolem:
+    cognitron_class = OpenAICognitron
     lexicon_class = GeneralLexicon
+    codex_class = ReasonableCodex
     runner_class = JustDoRunner
 
-    # TODO: Implement review_action_plan() ?
     # TODO: Spawn a new Golem to make parseable action plan from the reply ?
 
     def __init__(
-        self, *, goals: List[str], job_key: str,
+        self, *, name=DEFAULT_NAME, goals: List[str], job_key: str,
         memory: BaseMemory, settings: Settings
     ) -> None:
+        self.name = name
         self.action_plan = []
         self.job_key = job_key
         self.goals = goals
@@ -36,18 +43,26 @@ class General:
 
     def start_job(self) -> None:
         """Start the job."""
+        goals_text = '\n'.join(self.goals)
         console.info(f"Starting job: {self.job_key}")
+        console.info(f"Goals:\n{goals_text}")
+        #
         self.initialize()
         outcome = self.lexicon.goal_prompt(self.goals[-1])
         while True:
             try:
                 if outcome:
                     self.plan_actions(outcome)
+                    self.align_actions(outcome)
                 outcome = self.run_action()
             except JobFinished:
                 break
             except JobRejected:
                 break
+            except AlignAcionsError:
+                # TODO: Implement a retry plan mechanism after misalignment
+                break
+        #
         console.info(f"Job completed: {self.job_key}")
 
     def initialize(self) -> None:
@@ -65,6 +80,19 @@ class General:
             assert self.goals
 
         self.memory.save()
+    
+    def cognitron(self, memory: BaseMemory, **options) -> OpenAICognitron:
+        """Return a Cognitron instance."""
+        return self.cognitron_class(
+            settings=self.settings, memory=memory, **options
+        )
+
+    def codex(self, **options) -> BaseCodex:
+        """Return a Codex instance."""
+        key = f'{self.job_key}.{genkey()}'
+        memory = self.memory.spawn(key)
+        cognitron = self.cognitron(memory, name='', **options)
+        return self.codex_class(cognitron)
 
     def run_action(self) -> str:
         """Run the next action in the plan."""
@@ -78,44 +106,38 @@ class General:
 
     def plan_actions(self, prompt: str, attempt: int = 0) -> None:
         """Ask to update the plan based on the prompt."""
-        console.message('user', prompt)
-        dialog = Dialog(self.settings, self.memory)
-        reply = dialog.send_message(prompt)
-        console.message('golem-gpt', reply)
+        console.message(self.name, prompt)
+        reply = self.cognitron(self.memory).communicate(prompt)
         try:
             self.action_plan = self.lexicon.parse_reply(reply)
         except ParseActionsError:
             self.try_restore_plan(reply, attempt + 1)
 
+    def align_actions(self, prompt: str) -> List[str]:
+        """Align the action plan with the codex."""
+        return self.codex().align_actions(self.action_plan)
+
     # TODO: Extract restore strategy to a separate class
     def try_restore_plan(self, reply: str, attempt: int = 0) -> None:
         """Try restore the plan after malformed reply."""
         # Finish if too many failed attempts:
-        if attempt > RETRY_PLAN_MAX_ATTEMPTS:
+        if attempt > DEFAULT_RETRY_PLAN_ATTEMPTS:
             raise JobFinished()
 
-        # Ask in a side dialog, if job is finished:
+        # Ask in a helper dialog, if job is finished:
         question = self.lexicon.guess_finish_prompt(reply)
-        if self.guess_yesno(question):
+        if self.helper_yesno(question):
             raise JobFinished()
 
         # Try to plan again after remainder about the format:
         remainder = self.lexicon.remind_format_prompt()
         self.plan_actions(remainder, attempt + 1)
 
-    # TODO: Extract side dialog to a separate class (1)
-    def side_dialog(self, prompt: str) -> str:
-        """Spawn a side dialog to interpret the mainline replies."""
-        console.message('user', prompt)
-        key = f'{self.job_key}.{genkey()}'
-        dialog = Dialog(self.settings, self.memory.spawn(key))
-        reply = dialog.send_message(prompt, temperature=0)
-        console.message('quick', reply)
-        return reply
-
-    # TODO: Extract side dialog to a separate class (2)
-    def guess_yesno(self, question: str) -> bool:
+    # TODO: Extract helper dialogs to a separate class (?)
+    def helper_yesno(self, question: str) -> bool:
         """Guess if the reply is a yes or no."""
         prompt = self.lexicon.guess_yesno_prompt(question)
-        yesno = self.side_dialog(prompt)
-        return yesno.lower().startswith('y')
+        key = f'{self.job_key}.{genkey()}'
+        memory = self.memory.spawn(key)
+        cognitron = self.cognitron(memory, name='Helper')
+        return cognitron.ask_yesno(prompt)

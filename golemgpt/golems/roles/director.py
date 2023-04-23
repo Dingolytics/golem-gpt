@@ -1,5 +1,5 @@
-from .general import General
-from .lexicon import GeneralLexicon
+from golemgpt.golems.general import GeneralGolem
+from golemgpt.lexicon.general import GeneralLexicon
 
 # Use the real APIs, trigger search actions to get extra information when needed.
 # Autonomous bots are preferred. Ask for all prerequisite on start.
@@ -17,5 +17,5 @@ class DirectorLexicon(GeneralLexicon):
     role_model_prompt: str = PROMPT_FOR_DIRECTOR
 
 
-class Director(General):
+class DirectorGolem(GeneralGolem):
     lexicon_class = DirectorLexicon
