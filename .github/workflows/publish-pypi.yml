@@ -1,4 +1,4 @@
-name: Publish / Docker Hub
+name: Publish / PyPI
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-      TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD_TEST }}
       TWINE_NON_INTERACTIVE: "true"
     steps:
       -
@@ -35,4 +35,6 @@ jobs:
         name: Build and release
         run: |
           source venv/bin/activate && \
-          python3 -m build
+          python3 -m build && \
+          twine check dist/* && \
+          twine upload --repository testpypi dist/*
