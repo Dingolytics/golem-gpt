@@ -1,0 +1,38 @@
+name: Publish / Docker Hub
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'package'
+    paths-ignore:
+      - '**/*.md'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+      TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      TWINE_NON_INTERACTIVE: "true"
+    steps:
+      -
+        name: Checkout repository
+        uses: actions/checkout@v3
+      -
+        name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+          architecture: x64
+      -
+        name: Install dependencies
+        run: |
+          python3 -m venv ./venv && \
+          source venv/bin/activate && \
+          pip install --upgrade pip build twine
+      -
+        name: Build and release
+        run: |
+          source venv/bin/activate && \
+          python3 -m build
