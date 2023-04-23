@@ -11,6 +11,7 @@ from .http_download import http_download_action
 from .read_file import read_file_action
 from .reject_job import reject_job_action
 from .run_script import run_script_action
+from .summarize_file import summarize_file_action
 from .write_file import write_file_action
 
 __all__ = [
@@ -24,6 +25,7 @@ ALL_KNOWN_ACTIONS = {
     'http_download': http_download_action,
     #
     'read_file': read_file_action,
+    'summarize_file': summarize_file_action,
     'write_file': write_file_action,
     #
     'get_local_date': get_local_date_action,

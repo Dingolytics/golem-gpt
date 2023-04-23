@@ -12,9 +12,15 @@ def genkey() -> str:
     return f'{prefix}-{suffix}'
 
 
-def workpath(relpath: str) -> Path:
+def workpath(relpath: str, check_exists: bool = False) -> Path:
     cwd = Path.cwd().absolute()
     path = Path(Path.cwd() / relpath).absolute()
-    if cwd in path.parents:
-        return path
-    raise PathRejected(relpath, f"File {relpath} is outside of working dir.")
+    if cwd not in path.parents:
+        raise PathRejected(
+            relpath, f"File {relpath} is outside of working dir."
+        )
+    if check_exists and not path.exists():
+        raise PathRejected(
+            relpath, f"File {relpath} does not exist."
+        )
+    return path

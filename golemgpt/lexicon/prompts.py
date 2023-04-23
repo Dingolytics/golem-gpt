@@ -23,8 +23,7 @@ the higher priority:
 
 - get_os_details:
 - get_local_date:
-- summarize_file: filename, hint, out_filename
-- read_file: filename
+- read_file: filename, summazie_hint
 - write_file: filename, content
 - http_download: url, method, headers, body, out_filename
 - run_script: name

@@ -29,7 +29,7 @@ class GeneralLexicon:
         return 'If finished, just use a single "finish_job" action.'
 
     def guess_finish_prompt(self, reply: str) -> str:
-        preamble = self.lexicon.find_preamble(reply)
+        preamble = self.find_preamble(reply)
         statement = preamble or reply
         return (
             "Does the following mean current job is finished "

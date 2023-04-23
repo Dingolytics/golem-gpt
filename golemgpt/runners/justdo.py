@@ -22,6 +22,6 @@ class JustDoRunner:
                 raise UnknownAction(key)
             action_fn = self.known_actions[key]
             kwargs = action_item[key]
-            result = action_fn(**kwargs)
+            result = action_fn(golem=golem, **kwargs)
             break
         return (key, result)

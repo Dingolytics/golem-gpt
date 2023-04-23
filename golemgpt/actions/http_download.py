@@ -19,11 +19,14 @@ def http_download_action(
     except ValueError:
         return f"File {out_filename} is outside of working dir."
 
-    http_download(
+    response = http_download(
         method=method, url=url, path=path, headers=headers,
         json=body if isinstance(body, (dict, list)) else None,
         body=body if isinstance(body, str) else None,
     )
+
+    if response.status in (401, 403):
+        return "HTTP request failed: maybe ask user for credentials?"
 
     file_size = path.stat().st_size
     return HTTP_REQUEST_PROMPT.format(

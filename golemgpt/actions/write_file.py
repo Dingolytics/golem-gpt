@@ -4,10 +4,7 @@ from golemgpt.utils import workpath
 
 def write_file_action(filename: str, content: str, **kwargs) -> str:
     """Write a file and return its info."""
-    try:
-        path = workpath(filename)
-    except ValueError as exc:
-        return f"Rejected: {exc}"
+    path = workpath(filename)
 
     if not isinstance(content, str):
         content = json_dumps(content)

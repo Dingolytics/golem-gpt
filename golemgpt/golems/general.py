@@ -9,7 +9,8 @@ from golemgpt.memory import BaseMemory
 from golemgpt.utils import console, genkey
 from golemgpt.cognitron.openai import OpenAICognitron
 from golemgpt.utils.exceptions import (
-    JobFinished, JobRejected, ParseActionsError, AlignAcionsError
+    GolemError, AlignAcionsError, JobFinished, JobRejected,
+    ParseActionsError, PathRejected,
 )
 
 DEFAULT_NAME = 'Golem-GPT'
@@ -59,9 +60,14 @@ class GeneralGolem:
                 break
             except JobRejected:
                 break
-            except AlignAcionsError:
-                # TODO: Implement a retry plan mechanism after misalignment
+            except PathRejected:
                 break
+            except AlignAcionsError as exc:
+                # TODO: Implement a retry plan mechanism after misalignment
+                console.info(f"Actions rejected: {exc}")
+                break
+            except GolemError as exc:
+                outcome = str(exc)
         #
         console.info(f"Job completed: {self.job_key}")
 
@@ -81,17 +87,20 @@ class GeneralGolem:
 
         self.memory.save()
     
-    def cognitron(self, memory: BaseMemory, **options) -> OpenAICognitron:
+    def cognitron(self, spawn: bool = False, **options) -> OpenAICognitron:
         """Return a Cognitron instance."""
+        if spawn:
+            key = f'{self.job_key}.{genkey()}'
+            memory = self.memory.spawn(key)
+        else:
+            memory = self.memory
         return self.cognitron_class(
             settings=self.settings, memory=memory, **options
         )
 
     def codex(self, **options) -> BaseCodex:
         """Return a Codex instance."""
-        key = f'{self.job_key}.{genkey()}'
-        memory = self.memory.spawn(key)
-        cognitron = self.cognitron(memory, name='', **options)
+        cognitron = self.cognitron(spawn=True, name='', **options)
         return self.codex_class(cognitron)
 
     def run_action(self) -> str:
@@ -107,7 +116,7 @@ class GeneralGolem:
     def plan_actions(self, prompt: str, attempt: int = 0) -> None:
         """Ask to update the plan based on the prompt."""
         console.message(self.name, prompt)
-        reply = self.cognitron(self.memory).communicate(prompt)
+        reply = self.cognitron().communicate(prompt)
         try:
             self.action_plan = self.lexicon.parse_reply(reply)
         except ParseActionsError:
@@ -136,8 +145,6 @@ class GeneralGolem:
     # TODO: Extract helper dialogs to a separate class (?)
     def helper_yesno(self, question: str) -> bool:
         """Guess if the reply is a yes or no."""
-        prompt = self.lexicon.guess_yesno_prompt(question)
-        key = f'{self.job_key}.{genkey()}'
-        memory = self.memory.spawn(key)
-        cognitron = self.cognitron(memory, name='Helper')
+        prompt = self.lexicon.yesno_prompt(question)
+        cognitron = self.cognitron(spawn=True, name='Helper')
         return cognitron.ask_yesno(prompt)

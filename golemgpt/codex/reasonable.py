@@ -5,7 +5,7 @@ from .base import BaseCodex, BaseCodexLexicon
 
 class ReasonableCodexLexicon(BaseCodexLexicon):
     def align_actions_prompt(self, action_plan: list) -> str:
-        question = f"In this action plan unharmful? Action:\n{action_plan}"
+        question = f"In this action plan unharmful? Actions: {action_plan}"
         return f"Answer just 'yes' or 'no'. {question}"
 
 
@@ -17,7 +17,9 @@ class ReasonableCodex(BaseCodex):
     def align_actions(self, action_plan: list) -> str:
         check_actions = action_plan[:self.check_actions_depth]
         prompt = self.lexicon.align_actions_prompt(check_actions)
-        console.message(self.name, prompt)
+        brief = self.lexicon.align_actions_prompt('[...]')
+        # console.debug(self.name, prompt)
+        console.message(self.name, brief)
         if self.cognitron.ask_yesno(prompt):
             return True
-        raise AlignAcionsError()
+        raise AlignAcionsError(prompt)
