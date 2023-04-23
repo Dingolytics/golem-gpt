@@ -1,7 +1,7 @@
 Golem-GPT 
 =========
 
-![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dingolytics/golem-gpt?sort=date)
+![PyPI](https://img.shields.io/pypi/v/golem-gpt) ![PyPI - Status](https://img.shields.io/pypi/status/golem-gpt) ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dingolytics/golem-gpt?sort=date)
 
 ⚠️ **This is an experimental development. Run it on your own risk!** ⚠️
 
@@ -27,15 +27,25 @@ Put credentials to `.env`:
 ```bash
 OPENAI_API_KEY=...
 OPENAI_ORG_ID=...
+OPENAI_MODEL=gpt-4
 ```
 
-Run it:
+*(For `gpt-4` model you should have an early access enabled, it's not publicly available yet).*
+
+Run it via Docker Compose:
 
 ```bash
 docker compose build && docker compose run app
 ```
 
-It's also better to run it inside Docker to have it isolated. Because
+or via Python:
+
+```bash
+pip install --upgrade golem-gpt
+python -m golemgpt
+```
+
+❗️ It's safer to run it inside Docker to have it isolated. Because
 Golem can access an environment and filesystem, so it's better to keep
 it inside a container.
 
