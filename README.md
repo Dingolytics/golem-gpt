@@ -30,7 +30,8 @@ which is based on the following high-level concepts:
   actions, which are executed to achieve goals.
 
 - **Actions**: a set of actions, which are executed by the Golem to achieve
-  goals. Actions are implemented as Python functions.
+  goals. Actions could also be recursive or delegate their execution
+  to other Golems.
 
 - **Memory**: a storage for the Golem's current state, which can also be
   saved and loaded to continue the job later.
@@ -38,6 +39,8 @@ which is based on the following high-level concepts:
 - **Codex**: a built-in Golem's moderator, which is responsible for
   checking the agent's actions and preventing it from doing something
   unexpected. Codex has its own Cognitrion and Lexicon.
+
+NOTE: *In our implementation, Actions are implemented as Python functions*
 
 
 ### Why?
