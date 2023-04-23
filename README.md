@@ -27,11 +27,11 @@ which is based on the following high-level concepts:
   and interpret its structured output.
 
 - **Action plan**: a structured output of Cognitron, which is a set of
-  actions, which are executed to achieve goals.
+  actions to be executed for achieving goals.
 
-- **Actions**: a set of actions, which are executed by the Golem to achieve
-  goals. Actions could also be recursive or delegate their execution
-  to other Golems.
+- **Actions**: a predefined executables or functions, which can interact
+  with the environment to achieve goals. Actions could also be recursive or
+  delegate their execution to other Golems.
 
 - **Memory**: a storage for the Golem's current state, which can also be
   saved and loaded to continue the job later.
@@ -73,8 +73,7 @@ Usage
 The optimal way to run Golem-GPT is to use the [Docker image](https://hub.docker.com/r/dingolytics/golem-gpt) or Docker Compose:
 
 ```bash
-docker compose build
-docker compose run app
+docker compose build && docker compose run app
 ```
 
 It's also better to run it inside Docker to have it isolated. Because

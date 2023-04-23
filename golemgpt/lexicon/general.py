@@ -12,7 +12,7 @@ class GeneralLexicon:
     naive_preamble_re = re_compile(r'([^\[\{]*)', DOTALL)
 
     def goal_prompt(self, goal: str) -> str:
-        goal = f"{goal.strip()} Then finish the job."
+        goal = f"{goal.strip().rstrip('.')}. Then finish the job."
         return f"The goal is: {goal}"
 
     def yesno_prompt(self, question: str) -> str:
