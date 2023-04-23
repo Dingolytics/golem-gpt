@@ -1,18 +1,44 @@
 Golem-GPT 
 =========
 
-Golem powered by OpenAI GPT.
-
 ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dingolytics/golem-gpt?sort=date)
-
-
-Overview
---------
 
 ⚠️ **This is an experimental development. Run it on your own risk!** ⚠️
 
-Golem-GPT builds and executes an actionable pipeline to achieve goals
-specified by user. Powered by GPT-3.5 or GPT-4 by [OpenAI](https://openai.com).
+Framework for building actionable agents to achieve goals specified
+by user, powered by [OpenAI](https://openai.com) [GPT-4](https://openai.com/research/gpt-4)
+and [GPT-3.5](https://platform.openai.com/docs/models/gpt-3-5)
+
+
+### Architecture
+
+We introduce a novel framework for building **Golems** (actionable agents)
+which is based on the following high-level concepts:
+
+- **Goals**: a set of goals, initially defined by user's input. Goals could
+  be high-level definitions, like "I want to build a web app", or low-level
+  definitions, like "I want to create a new file with content 'Hello, world!'"
+
+- **Cognitron**: a language model, which interprets input text and produces an
+  action plan, or other kind of structured output. It runs on top of OpenAI
+  models, which could be potentially replaced with any other language model.
+
+- **Lexicon**: a set of rules and dictionary to generate prompts for Cognitron
+  and interpret its structured output.
+
+- **Action plan**: a structured output of Cognitron, which is a set of
+  actions, which are executed to achieve goals.
+
+- **Actions**: a set of actions, which are executed by the Golem to achieve
+  goals. Actions are implemented as Python functions.
+
+- **Memory**: a storage for the Golem's current state, which can also be
+  saved and loaded to continue the job later.
+
+- **Codex**: a built-in Golem's moderator, which is responsible for
+  checking the agent's actions and preventing it from doing something
+  unexpected. Codex has its own Cognitrion and Lexicon.
+
 
 ### Why?
 
