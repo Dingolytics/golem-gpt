@@ -27,7 +27,10 @@ Put credentials to `.env`:
 ```bash
 OPENAI_API_KEY=...
 OPENAI_ORG_ID=...
+OPENAI_MODEL=gpt-4
 ```
+
+*(For `gpt-4` model you should have an early access enabled, it's not publicly available yet).*
 
 Run it:
 

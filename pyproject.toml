@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "golem-gpt"
+version = "0.0.1"
+authors = [
+  { name="Alexey Kinev", email="rudy@05bit.com" },
+]
+description = "Framework for building actionable agents on top of GPT-4"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+include = ["golemgpt*"]
+exclude = ["tests*"]
+
+[project.urls]
+"Homepage" = "https://github.com/Dingolytics/golem-gpt"
+"Bug Tracker" = "https://github.com/Dingolytics/golem-gpt/issues"
