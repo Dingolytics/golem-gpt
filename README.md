@@ -87,11 +87,12 @@ Actions supported
 The pipeline consists of the following actions:
 
 - [x] ask_human_input(query)
-- [x] get_datetime()
+- [x] get_os_details()
 - [x] get_local_date()
 - [x] read_file(filename)
 - [x] write_file(filename, content)
-- [x] http_request(url, method, headers, body, to_filename)
+- [ ] summarize_file(filename, hint, to_filename)
+- [x] http_download(url, method, headers, body, to_filename)
 - [ ] create_python_script(name, description, in_files, out_files)
 - [ ] create_shell_script(name, description, in_files, out_files)
 - [x] run_script(name)
@@ -141,3 +142,7 @@ License
 -------
 
 Golem-GPT is licensed under the [Apache-2.0](LICENSE).
+
+Authors:
+
+- Alexey Kinev <rudy@05bit.com>
