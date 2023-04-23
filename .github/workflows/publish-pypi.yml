@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-      TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD_TEST }}
+      TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       TWINE_NON_INTERACTIVE: "true"
     steps:
       -
@@ -37,4 +37,4 @@ jobs:
           source venv/bin/activate && \
           python3 -m build && \
           twine check dist/* && \
-          twine upload --repository testpypi dist/*
+          twine upload dist/*
