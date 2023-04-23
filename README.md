@@ -32,13 +32,20 @@ OPENAI_MODEL=gpt-4
 
 *(For `gpt-4` model you should have an early access enabled, it's not publicly available yet).*
 
-Run it:
+Run it via Docker Compose:
 
 ```bash
 docker compose build && docker compose run app
 ```
 
-It's also better to run it inside Docker to have it isolated. Because
+or via Python:
+
+```bash
+pip install --upgrade golem-gpt
+python -m golemgpt
+```
+
+❗️ It's safer to run it inside Docker to have it isolated. Because
 Golem can access an environment and filesystem, so it's better to keep
 it inside a container.
 
