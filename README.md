@@ -1,7 +1,7 @@
 Golem-GPT 
 =========
 
-![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dingolytics/golem-gpt?sort=date)
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/dingolytics/golem-gpt?sort=date) ![PyPI](https://img.shields.io/pypi/v/golem-gpt)
 
 ⚠️ **This is an experimental development. Run it on your own risk!** ⚠️
 
