@@ -10,7 +10,38 @@ by user, powered by [OpenAI](https://openai.com) [GPT-4](https://openai.com/rese
 and [GPT-3.5](https://platform.openai.com/docs/models/gpt-3-5)
 
 
-### Architecture
+Usage
+-----
+
+The optimal way to run Golem-GPT is to use the [Docker image](https://hub.docker.com/r/dingolytics/golem-gpt) or Docker Compose.
+
+### Requirements
+
+- Docker or Python 3.8+ environment
+- OpenAI API key
+
+### Quick start
+
+Put credentials to `.env`:
+
+```bash
+OPENAI_API_KEY=...
+OPENAI_ORG_ID=...
+```
+
+Run it:
+
+```bash
+docker compose build && docker compose run app
+```
+
+It's also better to run it inside Docker to have it isolated. Because
+Golem can access an environment and filesystem, so it's better to keep
+it inside a container.
+
+
+Architecture
+------------
 
 We introduce a novel framework for building **Golems** (actionable agents)
 which is based on the following high-level concepts:
@@ -43,7 +74,8 @@ which is based on the following high-level concepts:
 NOTE: *In our implementation, Actions are implemented as Python functions*
 
 
-### Why?
+Why?
+----
 
 **How is it different from [AutoGPT](https://github.com/Significant-Gravitas/Auto-GPT)?**
 
@@ -58,27 +90,6 @@ as AutoGPT to the moment, but it has some unique focus:
   but it's waaay cheaper and delivers results good enough for many use cases
 - We are going to utilize it in our own development cycle, and refine it
   to fit real needs in software development
-
-
-Requirements
-------------
-
-- Docker or Python 3.8+ environment
-- OpenAI API key
-
-
-Usage
------
-
-The optimal way to run Golem-GPT is to use the [Docker image](https://hub.docker.com/r/dingolytics/golem-gpt) or Docker Compose:
-
-```bash
-docker compose build && docker compose run app
-```
-
-It's also better to run it inside Docker to have it isolated. Because
-Golem can access an environment and filesystem, so it's better to keep
-it inside a container.
 
 
 Actions supported
