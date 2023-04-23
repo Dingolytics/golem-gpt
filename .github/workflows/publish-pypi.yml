@@ -1,9 +1,13 @@
 name: Publish / PyPI
 
 on:
-  release:
-    types:
-      - published
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
+    paths-ignore:
+      - '**/*.md'
 
 jobs:
   build-and-publish:
