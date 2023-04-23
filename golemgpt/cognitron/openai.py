@@ -1,3 +1,4 @@
+from golemgpt.utils import console
 from golemgpt.settings import Settings
 from golemgpt.memory import BaseMemory
 from golemgpt.utils.http import http_request
@@ -5,6 +6,7 @@ from .base import BaseCognitron
 
 
 class OpenAICognitron(BaseCognitron):
+    DEFAULT_NAME = 'OpenAI'
     MAX_TOKENS = 0
     TEMPERATURE = 0.1
     COMPLETIONS_URL = 'https://api.openai.com/v1/chat/completions'
@@ -33,6 +35,7 @@ class OpenAICognitron(BaseCognitron):
         }
         if max_tokens:
             payload.update({'max_tokens': max_tokens})
+
         result = http_request(
             url=self.COMPLETIONS_URL, method='POST',
             headers=self.headers, json=payload
@@ -43,4 +46,6 @@ class OpenAICognitron(BaseCognitron):
         self.memory.messages = messages
         self.memory.save()
 
-        return self.get_last_message()
+        reply_text = self.get_last_message()
+        console.message(self.name, reply_text)
+        return reply_text

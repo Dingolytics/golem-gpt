@@ -10,13 +10,14 @@ class ReasonableCodexLexicon(BaseCodexLexicon):
 
 
 class ReasonableCodex(BaseCodex):
+    check_actions_depth = 3
     name = 'reasonable-codex'
     lexicon = ReasonableCodexLexicon()
 
     def align_actions(self, action_plan: list) -> str:
-        prompt = self.lexicon.align_actions_prompt(action_plan)
+        check_actions = action_plan[:self.check_actions_depth]
+        prompt = self.lexicon.align_actions_prompt(check_actions)
         console.message(self.name, prompt)
         if self.cognitron.ask_yesno(prompt):
             return True
-        console.message(self.name, prompt)
         raise AlignAcionsError()
