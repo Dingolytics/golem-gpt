@@ -18,10 +18,12 @@ __all__ = [
     'ALL_KNOWN_ACTIONS',
 ]
 
+
+def reply_yes_or_no(answer: str) -> bool:
+    return answer.lower().startswith('yes')
+
+
 ALL_KNOWN_ACTIONS = {
-    'ask_human_input': ask_human_input_action,
-    'ask_google': ask_google_action,
-    #
     'http_download': http_download_action,
     #
     'read_file': read_file_action,
@@ -40,4 +42,9 @@ ALL_KNOWN_ACTIONS = {
     'finish_job': finish_job_action,
     #
     'explain': explain_action,
+    #
+    # 'ask_google': ask_google_action,
+    'ask_human_input': ask_human_input_action,
+    #
+    'reply_yes_or_no': reply_yes_or_no
 }

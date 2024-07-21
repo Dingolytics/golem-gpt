@@ -3,7 +3,7 @@ import readline  # noqa
 
 from golemgpt.settings import Settings
 from golemgpt.memory.localfiles import LocalFilesMemory
-from golemgpt.golems.roles.director import DirectorGolem
+from golemgpt.golems.general import GeneralGolem
 from golemgpt.utils import chdir, console, genkey
 
 
@@ -30,19 +30,20 @@ def main():
     memory.load(job_key)
     goals = memory.goals
 
-    while not goals:
-        goal = input("Enter a goal for the Golem-GPT:\n?> ").strip()
-        if goal:
-            goals.append(goal)
+    # while not goals:
+    #     goal = input("Enter a goal for the Golem-GPT:\n?> ").strip()
+    #     if goal:
+    #         goals.append(goal)
+    goals = ["Get weather in Batumi, Georgia."]
 
-    director = DirectorGolem(
+    golem = GeneralGolem(
         goals=goals,
         job_key=job_key,
         memory=memory,
         settings=settings,
     )
     with chdir(outdir):
-        director.start_job()
+        golem.start_job()
 
 
 if __name__ == '__main__':

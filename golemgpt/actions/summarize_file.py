@@ -15,7 +15,7 @@ def summarize_file_action(
     with path.open("r") as file:
         content = file.read()
     content = content[:MAX_RAW_SIZE]
-    cognitron = golem.cognitron(spawn=True)
+    cognitron = golem.spawn_cognitron()
     prompt = f"Summarize the text, use the hint '{hint}':\n\n{content}"
     reply = cognitron.communicate(prompt)
     return write_file_action(out_filename, reply)
