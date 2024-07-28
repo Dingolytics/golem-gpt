@@ -2,12 +2,12 @@ from pydantic import BaseModel
 
 
 class BaseMemory(BaseModel):
-    key: str = ''
+    key: str = ""
     goals: list = []
-    messages: list = []
+    messages: list[dict] = []
     config: dict = {}
 
-    def spawn(self, key: str) -> 'BaseMemory':
+    def spawn(self, key: str) -> "BaseMemory":
         """Spawn a fresh memory instance."""
         cls = self.__class__
         instance = cls(config=self.config)
@@ -29,7 +29,7 @@ class BaseMemory(BaseModel):
         self.save_messages()
         self.save_goals()
 
-    def load_messages(self) -> list:
+    def load_messages(self) -> list[dict]:
         raise NotImplementedError()
 
     def save_messages(self) -> None:
@@ -59,5 +59,5 @@ class BaseMemory(BaseModel):
         role = item['role'].capitalize()
         print(f"{role}:")
         print("-" * (1 + len(role)))
-        print(item['content'].strip())
+        print(item["content"].strip())
         print("\n")

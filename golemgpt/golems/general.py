@@ -9,7 +9,7 @@ from golemgpt.settings import Settings
 from golemgpt.memory import BaseMemory
 from golemgpt.utils import console, genkey
 from golemgpt.cognitron.base import BaseCognitron
-from golemgpt.cognitron.openai import OpenAIWithToolsCognitron
+from golemgpt.cognitron.openai import OpenAIToolsCognitron
 from golemgpt.utils.exceptions import (
     GolemError,
     AlignAcionsError,
@@ -25,7 +25,7 @@ DEFAULT_RETRY_PLAN_ATTEMPTS = 3
 
 
 class GeneralGolem:
-    cognitron_class = OpenAIWithToolsCognitron
+    cognitron_class = OpenAIToolsCognitron
     codex_class = ReasonableCodex
     runner_class = JustDoRunner
 
@@ -68,7 +68,6 @@ class GeneralGolem:
                     if self.codex().align_actions(action_plan):
                         self.action_plan = action_plan
                 outcome = self.run_action()
-                break  # break early to DEBUG
             except JobFinished:
                 break
             except JobRejected:

@@ -1,3 +1,5 @@
+from secrets import token_hex
+from time import time
 from typing import Optional, Union
 from golemgpt.utils.misc import workpath
 from golemgpt.utils.http import http_download
@@ -8,12 +10,16 @@ Response saved to {out_filename} ({file_size} bytes).
 
 
 def http_download_action(
-    url: str, method: str, out_filename: str,
+    url: str, method: str = "GET", out_filename: str = "",
     headers: Optional[dict] = None,
     body: Union[str, list, dict] = None,
     **kwargs
 ) -> str:
     """Make an HTTP request and return its content."""
+
+    if not out_filename:
+        out_filename = f"out_{int(time())}_{token_hex(12)}.txt"
+
     try:
         path = workpath(out_filename)
     except ValueError:

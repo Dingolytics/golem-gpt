@@ -9,15 +9,15 @@ from golemgpt.utils import console
 from golemgpt.utils.exceptions import (
     ParseActionsError,
     UnknownAction,
-    UnknownReplyFormat
+    UnknownReplyFormat,
 )
 from golemgpt.utils.http import http_request
 from .base import BaseCognitron
 
 
-class OpenAINaiveCognitron(BaseCognitron):
+class OpenAITextCognitron(BaseCognitron):
     """
-    Naive implementation without explicit tools definition.
+    Cognitron powered by OpenAI API with plain text communication.
 
     Response format and actions list are not enforced but provided with
     initial prompts. Extra heuristics required to process outputs, e.g.
@@ -28,10 +28,11 @@ class OpenAINaiveCognitron(BaseCognitron):
     that does not support explicit tools and output formats definition.
 
     """
-    DEFAULT_NAME = 'OpenAI-Naive'
+
+    DEFAULT_NAME = "OpenAI-Text"
     MAX_TOKENS = 0
     TEMPERATURE = 0.1
-    COMPLETIONS_URL = 'https://api.openai.com/v1/chat/completions'
+    COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
     LEXICON_CLASS = GeneralLexicon
 
     def __init__(
@@ -39,31 +40,33 @@ class OpenAINaiveCognitron(BaseCognitron):
     ) -> None:
         super().__init__(settings, memory, **options)
         self.headers = {
-            'authorization': f'Bearer {settings.OPENAI_API_KEY}',
-            'openai-organization': settings.OPENAI_ORG_ID,
+            "authorization": f"Bearer {settings.OPENAI_API_KEY}",
+            "openai-organization": settings.OPENAI_ORG_ID,
         }
         self.model = settings.OPENAI_MODEL
         self.memory = memory
 
     def communicate(self, message: str, **options) -> Reply:
         """Communicate with the OpenAI and return the reply."""
-        max_tokens = options.get('max_tokens', self.MAX_TOKENS)
-        temperature = options.get('temperature', self.TEMPERATURE)
+        max_tokens = options.get("max_tokens", self.MAX_TOKENS)
+        temperature = options.get("temperature", self.TEMPERATURE)
         messages = self.memory.messages.copy()
-        messages.append({'role': 'user', 'content': message})
+        messages.append({"role": "user", "content": message})
         payload = {
-            'model': self.model,
-            'messages': messages,
-            'temperature': temperature,
+            "model": self.model,
+            "messages": messages,
+            "temperature": temperature,
         }
         if max_tokens:
-            payload.update({'max_tokens': max_tokens})
+            payload.update({"max_tokens": max_tokens})
 
         result = http_request(
-            url=self.COMPLETIONS_URL, method='POST',
-            headers=self.headers, json=payload
+            url=self.COMPLETIONS_URL,
+            method="POST",
+            headers=self.headers,
+            json=payload,
         )
-        reply = result['choices'][0]['message']
+        reply = result["choices"][0]["message"]
 
         messages.append(reply)
         self.memory.messages = messages
@@ -92,7 +95,7 @@ class OpenAINaiveCognitron(BaseCognitron):
         # prepended with some text, like "Here is your JSON:"
         preamble = self.lexicon.find_preamble(reply)
         if preamble:
-            reply = reply[len(preamble):]
+            reply = reply[len(preamble) :]
             console.debug(f"Parse plan (trunc.):\n{reply}\n")
 
         reply = reply.strip()
@@ -111,17 +114,23 @@ class OpenAINaiveCognitron(BaseCognitron):
 
 
 class OpenAIWithToolsLexicon(BaseLexicon):
+    def initializer_prompt(self) -> str:
+        return (
+            "You are smart bot that can fulfill high-level tasks "
+            "using API calls and other utilities."
+        )
 
     def goal_prompt(self, goal: str) -> str:
         tools_hint = (
             "NOTES: Use tools provided. "
-            "Ask credentials from user if needed first."
+            "Ask credentials from user if needed, be specific for which "
+            "API endpoint you'll use it (exact address needed)."
         )
-        goal = goal.strip().rstrip('.')
-        return f"The goal is: {goal}. {tools_hint}"
+        goal = goal.strip().rstrip(".")
+        return f"The goal is: {goal}.\n\n{tools_hint}"
 
     def yesno_prompt(self, question: str) -> str:
-        return f"'yes' or 'no'?. {question}"
+        return f"Reply 'yes' or 'no'. {question}"
 
     def action_result_prompt(self, action: str, result: str) -> str:
         return f'Completed "{action}" with result:\n{result}'
@@ -153,7 +162,7 @@ class OpenAIWithToolsLexicon(BaseLexicon):
         return (name, args)
 
 
-class OpenAIWithToolsCognitron(BaseCognitron):
+class OpenAIToolsCognitron(BaseCognitron):
     """
     Cognitron powered by OpenAI API with 'tools' feature.
 
@@ -164,19 +173,23 @@ class OpenAIWithToolsCognitron(BaseCognitron):
     get only one next action instead of multi-step action plan.
 
     """
-    DEFAULT_NAME = 'OpenAI-Tools'
+
+    DEFAULT_NAME = "OpenAI-Tools"
     MAX_TOKENS = 0
     TEMPERATURE = 0.1
-    COMPLETIONS_URL = 'https://api.openai.com/v1/chat/completions'
+    COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
     LEXICON_CLASS = OpenAIWithToolsLexicon
 
     def __init__(
-        self, settings: Settings, memory: BaseMemory, **options,
+        self,
+        settings: Settings,
+        memory: BaseMemory,
+        **options,
     ) -> None:
         super().__init__(settings, memory, **options)
         self.headers = {
-            'authorization': f'Bearer {settings.OPENAI_API_KEY}',
-            'openai-organization': settings.OPENAI_ORG_ID,
+            "authorization": f"Bearer {settings.OPENAI_API_KEY}",
+            "openai-organization": settings.OPENAI_ORG_ID,
         }
         self.model = settings.OPENAI_MODEL
         self.memory = memory
@@ -196,37 +209,37 @@ class OpenAIWithToolsCognitron(BaseCognitron):
 
         def _json_type(name: str) -> str:
             types_map = {
-                'str': 'string',
-                'float': 'number',
-                'int': 'number',
-                'bool': 'boolean',
-                # 'list': 'array',
-                'dict': 'object',
+                "str": "string",
+                "float": "number",
+                "int": "number",
+                "bool": "boolean",
+                "dict": "object",
             }
-            return types_map.get(name, 'object')
+            return types_map.get(name, "object")
 
         for key in actions:
             signature = inspect.signature(actions[key])
             if signature.parameters:
                 parameters = {
-                    'type': 'object',
-                    'properties': {
-                        name: {
-                            'type': _json_type(arg.annotation.__name__)
-                        } for name, arg in signature.parameters.items()
-                    }
+                    "type": "object",
+                    "properties": {
+                        name: {"type": _json_type(arg.annotation.__name__)}
+                        for name, arg in signature.parameters.items()
+                    },
                 }
             else:
                 parameters = {}
-            description = actions[key].__doc__ or ' '.join(key.split('_'))
-            tools.append({
-                'type': 'function',
-                'function': {
-                    'name': key,
-                    'description': description,
-                    'parameters': parameters,
-                },
-            })
+            description = actions[key].__doc__ or " ".join(key.split("_"))
+            tools.append(
+                {
+                    "type": "function",
+                    "function": {
+                        "name": key,
+                        "description": description,
+                        "parameters": parameters,
+                    },
+                }
+            )
         return tools
 
     def plan_actions(self, prompt: str, attempt: int = 0) -> list[dict]:
@@ -254,26 +267,46 @@ class OpenAIWithToolsCognitron(BaseCognitron):
 
     def communicate(self, message: str, **options) -> Reply:
         """Communicate with the OpenAI and return the reply."""
-        max_tokens = options.get('max_tokens', self.MAX_TOKENS)
-        temperature = options.get('temperature', self.TEMPERATURE)
+        max_tokens = options.get("max_tokens", self.MAX_TOKENS)
+        temperature = options.get("temperature", self.TEMPERATURE)
         messages = self.memory.messages.copy()
-        messages.append({'role': 'user', 'content': message})
+
+        # If previous message was a tool call then we should provide
+        # tool response in the specific format.
+        tool_call_id = ""
+        if messages:
+            last_message = messages[-1]
+            if "tool_calls" in last_message:
+                last_tool_call = last_message["tool_calls"][0]
+                tool_call_id = last_tool_call.get("id") or ""
+
+        if tool_call_id:
+            next_message = {
+                "role": "tool",
+                "content": message,
+                "tool_call_id": tool_call_id,
+            }
+        else:
+            next_message = {"role": "user", "content": message}
+        messages.append(next_message)
+
         payload = {
-            'model': self.model,
-            'messages': messages,
-            'temperature': temperature,
-            # 'response_format': {'type': 'json_object'},
-            'tools': self.tools,
-            'tool_choice': 'required'
+            "model": self.model,
+            "messages": messages,
+            "temperature": temperature,
+            "tools": self.tools,
+            "tool_choice": "required",
         }
         if max_tokens:
-            payload.update({'max_tokens': max_tokens})
+            payload.update({"max_tokens": max_tokens})
 
         result = http_request(
-            url=self.COMPLETIONS_URL, method='POST',
-            headers=self.headers, json=payload
+            url=self.COMPLETIONS_URL,
+            method="POST",
+            headers=self.headers,
+            json=payload,
         )
-        reply = result['choices'][0]['message']
+        reply = result["choices"][0]["message"]
 
         messages.append(reply)
         self.memory.messages = messages
@@ -282,4 +315,4 @@ class OpenAIWithToolsCognitron(BaseCognitron):
         reply_text = self.get_last_message()
         console.message(self.name, reply_text)
 
-        return Reply(actions=reply['tool_calls'])
+        return Reply(actions=reply["tool_calls"])

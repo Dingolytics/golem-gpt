@@ -1,8 +1,8 @@
 from .base import BaseCognitron
-from .openai import OpenAINaiveCognitron, OpenAIWithToolsCognitron
+from .openai import OpenAITextCognitron, OpenAIToolsCognitron
 
 __all__ = [
     'BaseCognitron',
-    'OpenAINaiveCognitron',
-    'OpenAIWithToolsCognitron',
+    'OpenAITextCognitron',
+    'OpenAIToolsCognitron',
 ]
