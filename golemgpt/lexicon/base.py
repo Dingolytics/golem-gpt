@@ -20,8 +20,13 @@ class BaseLexicon:
         return ""
 
     def goal_prompt(self, goal: str) -> str:
-        goal = f"{goal.strip().rstrip('.')}. Then finish the job."
-        return f"The goal is: {goal}"
+        tools_hint = (
+            "NOTES: Use actions provided. "
+            "Ask credentials from user if needed, be specific for which "
+            "API endpoint you'll use it (exact address needed)."
+        )
+        goal = goal.strip().rstrip('.')
+        return f"The goal is: {goal}.\n\n{tools_hint}"
 
     def yesno_prompt(self, question: str) -> str:
         return f"Answer 'yes' or 'no'. {question}"

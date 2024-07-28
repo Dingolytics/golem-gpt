@@ -1,5 +1,3 @@
-from typing import List
-
 from golemgpt.actions import ALL_KNOWN_ACTIONS
 from golemgpt.codex import BaseCodex
 from golemgpt.lexicon import BaseLexicon
@@ -9,6 +7,8 @@ from golemgpt.settings import Settings
 from golemgpt.memory import BaseMemory
 from golemgpt.utils import console, genkey
 from golemgpt.cognitron.base import BaseCognitron
+
+# from golemgpt.cognitron.openai import OpenAITextCognitron
 from golemgpt.cognitron.openai import OpenAIToolsCognitron
 from golemgpt.utils.exceptions import (
     GolemError,
@@ -19,7 +19,7 @@ from golemgpt.utils.exceptions import (
     PathRejected,
 )
 
-DEFAULT_NAME = 'Golem-GPT'
+DEFAULT_NAME = "Golem-GPT"
 
 DEFAULT_RETRY_PLAN_ATTEMPTS = 3
 
@@ -30,8 +30,13 @@ class GeneralGolem:
     runner_class = JustDoRunner
 
     def __init__(
-        self, *, name=DEFAULT_NAME, goals: List[str], job_key: str,
-        memory: BaseMemory, settings: Settings
+        self,
+        *,
+        name=DEFAULT_NAME,
+        goals: list[str],
+        job_key: str,
+        memory: BaseMemory,
+        settings: Settings,
     ) -> None:
         self.name = name
         self.action_plan = []
@@ -55,7 +60,7 @@ class GeneralGolem:
 
     def start_job(self) -> None:
         """Start the job."""
-        goals_text = '\n'.join(self.goals)
+        goals_text = "\n".join(self.goals)
         console.info(f"Starting job: {self.job_key}")
         console.info(f"Goals:\n{goals_text}")
 
@@ -103,18 +108,18 @@ class GeneralGolem:
         """Return a Cognitron instance."""
         assert self.settings, "Error: settings must be initialized first."
         assert self.memory, "Error: memory must be initialized first."
-        key = f'{self.job_key}.{genkey()}'
+        key = f"{self.job_key}.{genkey()}"
         memory = self.memory.spawn(key)
         return self.cognitron_class(
             settings=self.settings,
             memory=memory,
             actions=ALL_KNOWN_ACTIONS,
-            **options
+            **options,
         )
 
     def codex(self, **options) -> BaseCodex:
         """Return a Codex instance."""
-        cognitron = self.spawn_cognitron(name='Codex', **options)
+        cognitron = self.spawn_cognitron(name="Codex", **options)
         return self.codex_class(cognitron)
 
     def run_action(self) -> str:
@@ -124,7 +129,7 @@ class GeneralGolem:
         action_item = self.action_plan.pop(0)
         action, result = self.runner(action_item, golem=self)
         if not result:
-            return ''
+            return ""
         return self.lexicon.action_result_prompt(action, result)
 
     def plan_actions(self, prompt: str, attempt: int = 0) -> None:
@@ -136,7 +141,7 @@ class GeneralGolem:
         except ParseActionsError:
             self.try_restore_plan(reply, attempt + 1)
 
-    def align_actions(self, prompt: str) -> List[str]:
+    def align_actions(self, prompt: str) -> list[str]:
         """Align the action plan with the codex."""
         return self.codex().align_actions(self.action_plan)
 
@@ -158,5 +163,5 @@ class GeneralGolem:
     def helper_yesno(self, question: str) -> bool:
         """Guess if the reply is a yes or no."""
         prompt = self.lexicon.yesno_prompt(question)
-        cognitron = self.spawn_cognitron(name='Helper')
+        cognitron = self.spawn_cognitron(name="Helper")
         return cognitron.ask_yesno(prompt)

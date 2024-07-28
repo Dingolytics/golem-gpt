@@ -87,25 +87,26 @@ class OpenAITextCognitron(BaseCognitron):
 
         """
         console.message(self.name, prompt)
-        reply = self.communicate(prompt)
 
-        console.debug(f"Parse plan:\n{reply}\n")
+        reply = self.communicate(prompt)
+        reply_text = reply.text
+        console.debug(f"Parse plan:\n{reply_text}\n")
 
         # Remove not-a-JSON preamble, sometimes JSON is
         # prepended with some text, like "Here is your JSON:"
-        preamble = self.lexicon.find_preamble(reply)
+        preamble = self.lexicon.find_preamble(reply_text)
         if preamble:
-            reply = reply[len(preamble) :]
-            console.debug(f"Parse plan (trunc.):\n{reply}\n")
+            reply_text = reply_text[len(preamble):]
+            console.debug(f"Parse plan (trunc.):\n{reply_text}\n")
 
-        reply = reply.strip()
-        if not reply:
-            raise ParseActionsError("JSON not found", reply)
+        reply_text = reply_text.strip()
+        if not reply_text:
+            raise ParseActionsError("JSON not found", reply_text)
 
         try:
-            parsed = json_loads(reply)
+            parsed = json_loads(reply_text)
         except JSONDecodeError as exc:
-            raise ParseActionsError(exc.msg, reply) from exc
+            raise ParseActionsError(exc.msg, reply_text) from exc
 
         if isinstance(parsed, dict):
             parsed = [parsed]

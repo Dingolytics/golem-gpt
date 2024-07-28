@@ -28,7 +28,6 @@ the higher priority:
 - http_download: url, method, headers, body, out_filename
 - run_script: name
 - ask_human_input: query
-- ask_google: query, out_filename
 - explain: comment
 - reject_job: message
 - finish_job: message
