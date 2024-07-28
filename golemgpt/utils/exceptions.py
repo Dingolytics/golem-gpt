@@ -15,9 +15,14 @@ class JobRejected(GolemError):
 
 class PathRejected(GolemError, ValueError):
     """Raised when a requested path is rejected."""
+
     def __init__(self, path: str, *args):
         self.path = path
         super().__init__(*args)
+
+
+class UnknownReplyFormat(GolemError, RuntimeError):
+    """Raised when reply format is unknown."""
 
 
 class UnknownAction(GolemError, RuntimeError):
