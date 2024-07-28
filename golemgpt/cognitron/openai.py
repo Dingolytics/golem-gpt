@@ -68,12 +68,14 @@ class OpenAITextCognitron(BaseCognitron):
         )
         reply = result["choices"][0]["message"]
 
+        # Update history
         messages.append(reply)
         self.memory.messages = messages
         self.memory.save()
 
+        # Print console output
         reply_text = self.get_last_message()
-        console.message(self.name, reply_text)
+        console.message(self.name, reply_text, tags=["reply"])
 
         return Reply(text=reply_text)
 
@@ -86,7 +88,7 @@ class OpenAITextCognitron(BaseCognitron):
         we try to detect and truncate.
 
         """
-        console.message(self.name, prompt)
+        console.message(self.name, prompt, tags=["prompt"])
 
         reply = self.communicate(prompt)
         reply_text = reply.text
@@ -96,7 +98,7 @@ class OpenAITextCognitron(BaseCognitron):
         # prepended with some text, like "Here is your JSON:"
         preamble = self.lexicon.find_preamble(reply_text)
         if preamble:
-            reply_text = reply_text[len(preamble):]
+            reply_text = reply_text[len(preamble) :]
             console.debug(f"Parse plan (trunc.):\n{reply_text}\n")
 
         reply_text = reply_text.strip()
@@ -123,7 +125,7 @@ class OpenAIWithToolsLexicon(BaseLexicon):
 
     def goal_prompt(self, goal: str) -> str:
         tools_hint = (
-            "NOTES: Use tools provided. "
+            "NOTES: Use tools provided. Prefer public APIs (no credentials). "
             "Ask credentials from user if needed, be specific for which "
             "API endpoint you'll use it (exact address needed)."
         )
@@ -252,7 +254,7 @@ class OpenAIToolsCognitron(BaseCognitron):
         list because that's how OpenAI's tools feature works currently.
 
         """
-        console.message(self.name, prompt)
+        console.message(self.name, prompt, tags=["prompt"])
         reply = self.communicate(prompt)
         actions: list[dict] = []
 
@@ -308,12 +310,21 @@ class OpenAIToolsCognitron(BaseCognitron):
             json=payload,
         )
         reply = result["choices"][0]["message"]
+        actions = reply["tool_calls"]
 
+        # Update history
         messages.append(reply)
         self.memory.messages = messages
         self.memory.save()
 
-        reply_text = self.get_last_message()
-        console.message(self.name, reply_text)
+        # Print console output
+        reply_text = ""
+        for item in actions:
+            arguments = json_loads(item["function"]["arguments"])
+            arguments_text = " | ".join(
+                [f"{k}={v}" for k, v in arguments.items()]
+            )
+            reply_text += f'- {item["function"]["name"]}({arguments_text})'
+        console.message(self.name, reply_text.strip(), tags=["reply"])
 
-        return Reply(actions=reply["tool_calls"])
+        return Reply(actions=actions)

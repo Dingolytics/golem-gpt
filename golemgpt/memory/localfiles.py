@@ -12,6 +12,13 @@ class LocalFilesMemory(BaseMemory):
     def root_dir(self) -> Path:
         return self.config['root_dir']
 
+    def get_path(self, filename: str) -> Path:
+        assert self.key
+        path = self.root_dir
+        for key_part in self.key.split('/'):
+            path = path / key_part
+        return path / filename
+
     def spawn(self, key: str) -> 'LocalFilesMemory':
         """Spawn a fresh memory instance."""
         isinstance = LocalFilesMemory(self.root_dir)
@@ -20,8 +27,7 @@ class LocalFilesMemory(BaseMemory):
 
     def load_file(self, filename: str, default: object) -> list:
         """Load JSON data from a local file."""
-        assert self.key
-        path = self.root_dir / self.key / filename
+        path = self.get_path(filename)
         if path.exists():
             with path.open() as file:
                 return json_load(file)
@@ -29,8 +35,7 @@ class LocalFilesMemory(BaseMemory):
 
     def save_file(self, filename: str, data: object) -> None:
         """Save JSON data to a local file."""
-        assert self.key
-        path = self.root_dir / self.key / filename
+        path = self.get_path(filename)
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open('w') as file:
             json_dump(data, file, indent=2, ensure_ascii=False)

@@ -30,11 +30,14 @@ def main():
     memory.load(job_key)
     goals = memory.goals
 
-    # while not goals:
-    #     goal = input("Enter a goal for the Golem-GPT:\n?> ").strip()
-    #     if goal:
-    #         goals.append(goal)
-    goals = ["Get weather in Batumi, Georgia."]
+    while not goals:
+        goal = input("Enter a goal for the Golem-GPT:\n?> ").strip()
+        if goal:
+            goals.append(goal)
+    # goals = [
+    #     "Get weather in Batumi, Georgia. "
+    #     "Write results in human readable format."
+    # ]
 
     golem = GeneralGolem(
         goals=goals,

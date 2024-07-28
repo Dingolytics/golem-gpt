@@ -54,10 +54,6 @@ class GeneralGolem:
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.job_key})"
 
-    @property
-    def lexicon(self) -> BaseLexicon:
-        return self.core.lexicon
-
     def start_job(self) -> None:
         """Start the job."""
         goals_text = "\n".join(self.goals)
@@ -65,13 +61,14 @@ class GeneralGolem:
         console.info(f"Goals:\n{goals_text}")
 
         self.initialize()
-        outcome = self.lexicon.goal_prompt(self.goals[-1])
+
+        outcome = self.lexicon().goal_prompt(self.goals[-1])
         while True:
             try:
                 if outcome:
-                    action_plan = self.core.plan_actions(outcome)
-                    if self.codex().align_actions(action_plan):
-                        self.action_plan = action_plan
+                    new_action_plan = self.plan_actions(outcome)
+                    self.align_actions(new_action_plan)
+                    self.action_plan = new_action_plan
                 outcome = self.run_action()
             except JobFinished:
                 break
@@ -95,7 +92,7 @@ class GeneralGolem:
 
         if self.memory.is_history_empty:
             self.memory.goals = self.goals
-            iniital_history = self.lexicon.initializer_history()
+            iniital_history = self.lexicon().initializer_history()
             for message in iniital_history:
                 self.memory.messages.append(message)
         else:
@@ -104,11 +101,11 @@ class GeneralGolem:
 
         self.memory.save()
 
-    def spawn_cognitron(self, **options) -> BaseCognitron:
-        """Return a Cognitron instance."""
+    def cognitron(self, **options) -> BaseCognitron:
+        """Return a new Cognitron instance."""
         assert self.settings, "Error: settings must be initialized first."
         assert self.memory, "Error: memory must be initialized first."
-        key = f"{self.job_key}.{genkey()}"
+        key = f"{self.job_key}/{genkey()}"
         memory = self.memory.spawn(key)
         return self.cognitron_class(
             settings=self.settings,
@@ -118,9 +115,12 @@ class GeneralGolem:
         )
 
     def codex(self, **options) -> BaseCodex:
-        """Return a Codex instance."""
-        cognitron = self.spawn_cognitron(name="Codex", **options)
+        """Return a new Codex instance."""
+        cognitron = self.cognitron(name="Codex", **options)
         return self.codex_class(cognitron)
+
+    def lexicon(self) -> BaseLexicon:
+        return self.core.lexicon
 
     def run_action(self) -> str:
         """Run the next action in the plan."""
@@ -130,38 +130,18 @@ class GeneralGolem:
         action, result = self.runner(action_item, golem=self)
         if not result:
             return ""
-        return self.lexicon.action_result_prompt(action, result)
+        return self.lexicon().action_result_prompt(action, result)
 
-    def plan_actions(self, prompt: str, attempt: int = 0) -> None:
-        """Ask to update the plan based on the prompt."""
-        console.message(self.name, prompt)
-        reply = self.core.communicate(prompt)
+    def plan_actions(self, prompt: str, attempt: int = 0) -> list[dict]:
+        """Generate an action plan based on the prompt."""
         try:
-            self.action_plan = self.core.plan_actions(prompt)
+            action_plan = self.core.plan_actions(prompt)
         except ParseActionsError:
-            self.try_restore_plan(reply, attempt + 1)
+            # TODO: Ingest format reminder message to the memory and retry,
+            # check `lexicon.remind_format_prompt()`.
+            raise
+        return action_plan
 
-    def align_actions(self, prompt: str) -> list[str]:
+    def align_actions(self, action_plan: list[dict]) -> list[str]:
         """Align the action plan with the codex."""
-        return self.codex().align_actions(self.action_plan)
-
-    def try_restore_plan(self, reply: str, attempt: int = 0) -> None:
-        """Try restore the plan after malformed reply."""
-        # Finish if too many failed attempts:
-        if attempt > DEFAULT_RETRY_PLAN_ATTEMPTS:
-            raise JobFinished()
-
-        # Ask in a helper dialog, if job is finished:
-        question = self.lexicon.guess_finish_prompt(reply)
-        if self.helper_yesno(question):
-            raise JobFinished()
-
-        # Try to plan again after remainder about the format:
-        remainder = self.lexicon.remind_format_prompt()
-        self.plan_actions(remainder, attempt + 1)
-
-    def helper_yesno(self, question: str) -> bool:
-        """Guess if the reply is a yes or no."""
-        prompt = self.lexicon.yesno_prompt(question)
-        cognitron = self.spawn_cognitron(name="Helper")
-        return cognitron.ask_yesno(prompt)
+        return self.codex().align_actions(action_plan)

@@ -5,7 +5,10 @@ from .base import BaseCodex
 
 class ReasonableCodex(BaseCodex):
     check_actions_depth = 3
-    name = "reasonable-codex"
+
+    @property
+    def name(self):
+        return self.cognitron.name
 
     def is_job_finished(self, actions: list[dict]) -> bool:
         if len(actions) == 1:
@@ -32,7 +35,7 @@ class ReasonableCodex(BaseCodex):
 
         check_actions = actions[: self.check_actions_depth]
         prompt, answer_expected = self.align_actions_prompt(check_actions)
-        console.message(self.name, prompt)
+        console.message(self.name, prompt, tags=["prompt"])
         answer_real = self.cognitron.ask_yesno(prompt)
         if answer_expected == answer_real:
             return True

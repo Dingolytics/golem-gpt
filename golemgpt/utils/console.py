@@ -2,7 +2,7 @@ from termcolor import cprint, colored
 
 _DEBUG = False
 
-_COLORS = ['light_red', 'green', 'yellow', 'blue', 'light_magenta']
+_COLORS = ["light_red", "green", "yellow", "blue", "light_magenta"]
 
 
 def set_debug(enabled: bool) -> None:
@@ -10,20 +10,21 @@ def set_debug(enabled: bool) -> None:
     _DEBUG = enabled
 
 
-def message(author: str, text: str) -> None:
+def message(author: str, text: str, tags: list[str] | None = None) -> None:
     author = author.upper()
     idx = sum(ord(char) for char in author) % len(_COLORS)
     author_color = _COLORS[idx]
-    cprint(colored(author, author_color, None, []))
+    title = author + (f" [{', '.join(tags)}]" if tags else "")
+    cprint(colored(title, author_color, None, []))
     print(text)
-    print('')
+    print("")
 
 
 def info(text: str) -> None:
-    cprint(text, 'cyan')
+    cprint(text, "cyan")
 
 
-def debug(text: str, indent='    ') -> None:
+def debug(text: str, indent="    ") -> None:
     if _DEBUG:
-        indented = '\n'.join([f'{indent}{x}' for x in text.splitlines()])
-        cprint(indented, 'grey')
+        indented = "\n".join([f"{indent}{x}" for x in text.splitlines()])
+        cprint(indented, "grey")

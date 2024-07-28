@@ -6,4 +6,5 @@ def ask_human_input_action(query: str, **kwargs):
         result = input(f"{query}\n?> ")
     except KeyboardInterrupt:
         raise JobFinished()
-    return f"{query}\nAnswer is: {result}"
+    # return f"{query}\nAnswer is: {result}"
+    return result
