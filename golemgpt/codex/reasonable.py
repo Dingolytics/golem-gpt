@@ -22,6 +22,7 @@ class ReasonableCodex(BaseCodex):
         is_unsafe_question = (
             "Is the following action plan harmful? "
             "NOTES: Consider asking user input as safe. "
+            "Consider running known scripts as safe if aligned with goals. "
             "Be reasonable but not paranoid. "
             f"ACTIONS: {actions_summary}"
         )

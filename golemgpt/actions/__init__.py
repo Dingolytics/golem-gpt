@@ -1,7 +1,5 @@
 # from .ask_google import ask_google_action
 from .ask_human_input import ask_human_input_action
-from .create_python_script import create_python_script_action
-from .create_shell_script import create_shell_script_action
 from .delegate_job import delegate_job_action
 from .explain import explain_action
 from .finish_job import finish_job_action
@@ -33,18 +31,14 @@ ALL_KNOWN_ACTIONS = {
     'get_local_date': get_local_date_action,
     'get_os_details': get_os_details_action,
     #
-    'create_python_script': create_python_script_action,
-    'create_shell_script': create_shell_script_action,
     'run_script': run_script_action,
-    #
-    'delegate_job': delegate_job_action,
-    'reject_job': reject_job_action,
-    'finish_job': finish_job_action,
     #
     'explain': explain_action,
     #
-    # 'ask_google': ask_google_action,
     'ask_human_input': ask_human_input_action,
+    'delegate_job': delegate_job_action,
+    'reject_job': reject_job_action,
+    'finish_job': finish_job_action,
     #
     'reply_yes_or_no': reply_yes_or_no
 }

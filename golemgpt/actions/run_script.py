@@ -7,7 +7,10 @@ def run_script_action(name: str, **kwargs) -> str:
     path = workpath(name)
 
     if not path.exists():
-        return f"Script {name} does not exist, can you create it?"
+        return (
+            f"Script {name} does not exist, please create if first "
+            "and use a proper extension like .sh or .py"
+        )
 
     if name.endswith('.py'):
         process = subprocess.Popen(['python', name])
