@@ -116,8 +116,12 @@ class GeneralGolem:
 
     def codex(self, **options) -> BaseCodex:
         """Return a new Codex instance."""
-        cognitron = self.cognitron(name="Codex", **options)
-        return self.codex_class(cognitron)
+        assert self.settings, "Error: settings must be initialized first."
+        assert self.memory, "Error: memory must be initialized first."
+        key = f"{self.job_key}/{genkey()}"
+        return self.codex_class(
+            settings=self.settings, memory=self.memory.spawn(key)
+        )
 
     def lexicon(self) -> BaseLexicon:
         return self.core.lexicon

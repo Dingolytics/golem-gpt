@@ -1,14 +1,31 @@
+from golemgpt.actions import CODEX_ACTIONS
 from golemgpt.utils import console
 from golemgpt.utils.exceptions import AlignAcionsError
+from golemgpt.cognitron.openai import OpenAIToolsCognitron
 from .base import BaseCodex
 
 
 class ReasonableCodex(BaseCodex):
+    _cognitron: OpenAIToolsCognitron | None = None
+
+    _name: str = "Reasonable-Codex"
+
     check_actions_depth = 3
 
     @property
-    def name(self):
-        return self.cognitron.name
+    def cognitron(self) -> OpenAIToolsCognitron:
+        if not self._cognitron:
+            return OpenAIToolsCognitron(
+                settings=self.settings,
+                memory=self.memory,
+                actions=CODEX_ACTIONS,
+                name=self.name,
+            )
+        return self._cognitron
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     def is_job_finished(self, actions: list[dict]) -> bool:
         if len(actions) == 1:

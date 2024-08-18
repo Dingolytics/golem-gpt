@@ -125,9 +125,10 @@ class OpenAIWithToolsLexicon(BaseLexicon):
 
     def goal_prompt(self, goal: str) -> str:
         tools_hint = (
-            "NOTES: Use tools provided. Prefer public APIs (no credentials). "
-            "Ask credentials from user if needed, be specific for which "
-            "API endpoint you'll use it (exact address needed)."
+            "NOTES: Use tools provided. Prefer public APIs that do not "
+            "require credentials. Ask credentials from user if needed, "
+            "be specific for which API endpoint you'll use it (exact "
+            "address needed)."
         )
         goal = goal.strip().rstrip(".")
         return f"The goal is: {goal}.\n\n{tools_hint}"
@@ -195,7 +196,6 @@ class OpenAIToolsCognitron(BaseCognitron):
             "openai-organization": settings.OPENAI_ORG_ID,
         }
         self.model = settings.OPENAI_MODEL
-        self.memory = memory
         self.tools = self.parse_actions_to_tools(self.actions)
 
     @classmethod
