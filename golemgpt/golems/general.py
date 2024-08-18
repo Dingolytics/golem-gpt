@@ -1,6 +1,5 @@
 from golemgpt.actions import ALL_KNOWN_ACTIONS
 from golemgpt.codex import BaseCodex
-from golemgpt.lexicon import BaseLexicon
 from golemgpt.codex import ReasonableCodex
 from golemgpt.runners import JustDoRunner
 from golemgpt.settings import Settings
@@ -8,7 +7,6 @@ from golemgpt.memory import BaseMemory
 from golemgpt.utils import console, genkey
 from golemgpt.cognitron.base import BaseCognitron
 
-# from golemgpt.cognitron.openai import OpenAITextCognitron
 from golemgpt.cognitron.openai import OpenAIToolsCognitron
 from golemgpt.utils.exceptions import (
     GolemError,
@@ -45,11 +43,7 @@ class GeneralGolem:
         self.memory = memory
         self.settings = settings
         self.runner = self.runner_class(settings)
-        self.core = self.cognitron_class(
-            settings=self.settings,
-            memory=memory,
-            actions=ALL_KNOWN_ACTIONS,
-        )
+        self.core = self.cognitron()
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.job_key})"
@@ -62,7 +56,7 @@ class GeneralGolem:
 
         self.initialize()
 
-        outcome = self.lexicon().goal_prompt(self.goals[-1])
+        outcome = self.core.lexicon.goal_prompt(self.goals[-1])
         while True:
             try:
                 if outcome:
@@ -92,7 +86,7 @@ class GeneralGolem:
 
         if self.memory.is_history_empty:
             self.memory.goals = self.goals
-            iniital_history = self.lexicon().initializer_history()
+            iniital_history = self.core.lexicon.initializer_history()
             for message in iniital_history:
                 self.memory.messages.append(message)
         else:
@@ -111,6 +105,7 @@ class GeneralGolem:
             settings=self.settings,
             memory=memory,
             actions=ALL_KNOWN_ACTIONS,
+            verbosity=self.settings.VERBOSITY_MAIN,
             **options,
         )
 
@@ -120,11 +115,9 @@ class GeneralGolem:
         assert self.memory, "Error: memory must be initialized first."
         key = f"{self.job_key}/{genkey()}"
         return self.codex_class(
-            settings=self.settings, memory=self.memory.spawn(key)
-        )
-
-    def lexicon(self) -> BaseLexicon:
-        return self.core.lexicon
+            settings=self.settings,
+            memory=self.memory.spawn(key)
+        )  # fmt: skip
 
     def run_action(self) -> str:
         """Run the next action in the plan."""
@@ -134,7 +127,7 @@ class GeneralGolem:
         action, result = self.runner(action_item, golem=self)
         if not result:
             return ""
-        return self.lexicon().action_result_prompt(action, result)
+        return self.core.lexicon.action_result_prompt(action, result)
 
     def plan_actions(self, prompt: str, attempt: int = 0) -> list[dict]:
         """Generate an action plan based on the prompt."""

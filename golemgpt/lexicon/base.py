@@ -8,7 +8,7 @@ from golemgpt.utils.exceptions import UnknownReplyFormat
 class Reply(BaseModel):
     """General representation of reploy from Cognitron."""
 
-    text: str = ''
+    text: str = ""
     actions: list = []
 
 
@@ -50,16 +50,14 @@ class BaseLexicon:
         """Guess if the reply is yes or no."""
         if not reply.text:
             raise UnknownReplyFormat(f"{reply}")
-        return reply.text.lower().startswith('yes')
+        return reply.text.lower().startswith("yes")
 
     def initializer_history(self) -> list:
         prompt = self.initializer_prompt()
-        return [
-            {'role': 'user', 'content': prompt},
-        ]
+        return [{"role": "user", "content": prompt}]
 
     def find_preamble(self, reply: str) -> str:
         preamble = self.naive_preamble_re.search(reply)
         if preamble:
             return preamble.group()
-        return ''
+        return ""

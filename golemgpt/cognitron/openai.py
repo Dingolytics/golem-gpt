@@ -4,7 +4,7 @@ from typing import Any, Callable
 
 from golemgpt.lexicon import BaseLexicon, GeneralLexicon, Reply
 from golemgpt.memory import BaseMemory
-from golemgpt.settings import Settings
+from golemgpt.settings import Settings, Verbosity
 from golemgpt.utils import console
 from golemgpt.utils.exceptions import (
     ParseActionsError,
@@ -36,7 +36,11 @@ class OpenAITextCognitron(BaseCognitron):
     LEXICON_CLASS = GeneralLexicon
 
     def __init__(
-        self, settings: Settings, memory: BaseMemory, **options
+        self,
+        settings: Settings,
+        memory: BaseMemory,
+        verbosity: Verbosity = Verbosity.NORMAL,
+        **options
     ) -> None:
         super().__init__(settings, memory, **options)
         self.headers = {
@@ -45,6 +49,7 @@ class OpenAITextCognitron(BaseCognitron):
         }
         self.model = settings.OPENAI_MODEL
         self.memory = memory
+        self.verbosity = verbosity
 
     def communicate(self, message: str, **options) -> Reply:
         """Communicate with the OpenAI and return the reply."""
@@ -75,7 +80,9 @@ class OpenAITextCognitron(BaseCognitron):
 
         # Print console output
         reply_text = self.get_last_message()
-        console.message(self.name, reply_text, tags=["reply"])
+
+        if self.verbosity >= Verbosity.COMPACT:
+            console.message(self.name, reply_text, tags=["reply"])
 
         return Reply(text=reply_text)
 
@@ -88,7 +95,8 @@ class OpenAITextCognitron(BaseCognitron):
         we try to detect and truncate.
 
         """
-        console.message(self.name, prompt, tags=["prompt"])
+        if self.verbosity >= Verbosity.COMPACT:
+            console.message(self.name, prompt, tags=["prompt"])
 
         reply = self.communicate(prompt)
         reply_text = reply.text
@@ -156,7 +164,8 @@ class OpenAIWithToolsLexicon(BaseLexicon):
         try:
             name = item["function"]["name"]
         except KeyError:
-            console.info(f"Unknown action: {item}")
+            if self.verbosity >= Verbosity.COMPACT:
+                console.info(f"Unknown action: {item}")
 
         try:
             args = json_loads(item["function"]["arguments"])
@@ -188,7 +197,8 @@ class OpenAIToolsCognitron(BaseCognitron):
         self,
         settings: Settings,
         memory: BaseMemory,
-        **options,
+        verbosity: Verbosity = Verbosity.NORMAL,
+        **options
     ) -> None:
         super().__init__(settings, memory, **options)
         self.headers = {
@@ -197,6 +207,7 @@ class OpenAIToolsCognitron(BaseCognitron):
         }
         self.model = settings.OPENAI_MODEL
         self.tools = self.parse_actions_to_tools(self.actions)
+        self.verbosity = verbosity
 
     @classmethod
     def parse_actions_to_tools(
@@ -254,7 +265,8 @@ class OpenAIToolsCognitron(BaseCognitron):
         list because that's how OpenAI's tools feature works currently.
 
         """
-        console.message(self.name, prompt, tags=["prompt"])
+        if self.verbosity >= Verbosity.COMPACT:
+            console.message(self.name, prompt, tags=["prompt"])
         reply = self.communicate(prompt)
         actions: list[dict] = []
 
@@ -325,6 +337,7 @@ class OpenAIToolsCognitron(BaseCognitron):
                 [f"{k}={v}" for k, v in arguments.items()]
             )
             reply_text += f'- {item["function"]["name"]}({arguments_text})'
-        console.message(self.name, reply_text.strip(), tags=["reply"])
+        if self.verbosity >= Verbosity.COMPACT:
+            console.message(self.name, reply_text.strip(), tags=["reply"])
 
         return Reply(actions=actions)
