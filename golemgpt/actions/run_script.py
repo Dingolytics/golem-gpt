@@ -1,4 +1,4 @@
-import subprocess
+from subprocess import PIPE, Popen
 from golemgpt.utils import workpath
 
 
@@ -8,22 +8,28 @@ def run_script_action(name: str, **kwargs) -> str:
 
     if not path.exists():
         return (
-            f"Script {name} does not exist, please create if first "
-            "and use a proper extension like .sh or .py"
+            f"Script {name} does not exist, please write if first. "
+            "Use a proper extension like .sh or .py for saved file."
         )
 
     if name.endswith('.py'):
-        process = subprocess.Popen(['python', name])
+        process = Popen(['python', name], stdout=PIPE, stderr=PIPE)
     elif name.endswith('.sh'):
-        process = subprocess.Popen(['sh', name])
+        process = Popen(['sh', name], stdout=PIPE, stderr=PIPE)
     else:
         return f"Rejected: script {name} is not a Bash or Python script."
 
-    process.wait()
+    output, error = process.communicate()
     is_ok = (process.returncode == 0)
 
+    if isinstance(output, bytes):
+        output = output.decode("utf-8")
+
+    if isinstance(error, bytes):
+        error = error.decode("utf-8")
+
     return (
-        f"Script {name} executed successfully."
+        f"Script {name} executed successfully. Output:\n{output}"
         if is_ok else
-        f"Script {name} failed."
+        f"Script {name} failed. Error:\n{error}"
     )
