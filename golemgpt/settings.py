@@ -14,12 +14,15 @@ class Verbosity(IntEnum):
 
 class Settings(BaseSettings):
     GOLEM_DEBUG: bool = False
-    OPENAI_API_KEY: str = ""
-    OPENAI_ORG_ID: str = ""
-    OPENAI_MODEL: str = "gpt-4-turbo"
     WORKDIR: Path = Path("workdir")
     VERBOSITY_MAIN: Verbosity = Verbosity.NORMAL
     VERBOSITY_CODEX: Verbosity = Verbosity.SILENT
+
+    OPENAI_API_KEY: str = ""
+    OPENAI_ORG_ID: str = ""
+    OPENAI_MODEL: str = "gpt-4-turbo"
+
+    BING_SEARCH_API_KEY: str = ""
 
     class Config:
         env_file = ".env"

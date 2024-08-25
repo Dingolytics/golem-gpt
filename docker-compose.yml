@@ -4,10 +4,11 @@ services:
   app:
     build: .
     environment:
+      WORKDIR: /var/app/workdir
+      GOLEM_DEBUG: ${GOLEM_DEBUG:-false}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_ORG_ID: ${OPENAI_ORG_ID}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4-turbo}
-      WORKDIR: /var/app/workdir
-      GOLEM_DEBUG: ${GOLEM_DEBUG:-false}
+      BING_SEARCH_API_KEY: ${BING_SEARCH_API_KEY}
     volumes:
       - ./workdir:/var/app/workdir
