@@ -53,10 +53,10 @@ def http_request(
     response = _do_request(
         method=method, url=url, headers=headers, json=json, **kwargs
     )
-    content_type = response.headers["content-type"]
-    # TODO: Guess more types if required (e.g. XML, CSV, query string)
-    json_result = json_result or content_type in ("application/json",)
     if response.status == 200:
+        content_type = response.headers["content-type"]
+        # TODO: Guess more types if required (e.g. XML, CSV, query string)
+        json_result = json_result or content_type in ("application/json",)
         if json_result:
             return json_loads(response.data)
         return response.data
