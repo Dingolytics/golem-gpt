@@ -15,7 +15,7 @@ def http_download_action(
     body: Union[str, list, dict] = None,
     **kwargs
 ) -> str:
-    """Make an HTTP request and return its content."""
+    """Make HTTP request, save result to file (JSON, PNG, PDF, etc.)"""
 
     if not out_filename:
         out_filename = f"out_{int(time())}_{token_hex(12)}.txt"

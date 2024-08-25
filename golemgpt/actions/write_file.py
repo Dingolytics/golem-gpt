@@ -3,7 +3,7 @@ from golemgpt.utils import workpath
 
 
 def write_file_action(filename: str, content: str, **kwargs) -> str:
-    """Write a file and return its info."""
+    """Write a text file."""
     path = workpath(filename)
 
     if not isinstance(content, str):
@@ -12,4 +12,5 @@ def write_file_action(filename: str, content: str, **kwargs) -> str:
     with path.open("w") as file:
         file.write(content)
 
-    return f'File "{filename}" is saved.'
+    file_size = path.stat().st_size
+    return f'File "{filename}" is saved ({file_size} bytes).'
