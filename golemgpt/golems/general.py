@@ -1,7 +1,5 @@
 from golemgpt.actions import ALL_KNOWN_ACTIONS
 from golemgpt.codex import BaseCodex
-from golemgpt.codex import ReasonableCodex
-from golemgpt.runners import JustDoRunner
 from golemgpt.settings import Settings
 from golemgpt.memory import BaseMemory
 from golemgpt.utils import console, genkey
@@ -24,8 +22,6 @@ DEFAULT_RETRY_PLAN_ATTEMPTS = 3
 
 class GeneralGolem:
     cognitron_class = OpenAIToolsCognitron
-    codex_class = ReasonableCodex
-    runner_class = JustDoRunner
 
     def __init__(
         self,
@@ -42,7 +38,8 @@ class GeneralGolem:
         self.goals = goals
         self.memory = memory
         self.settings = settings
-        self.runner = self.runner_class(settings)
+        self.codex_class = settings.CODEX_CLASS
+        self.runner = settings.RUNNER_CLASS(settings)
         self.core = self.cognitron()
 
     def __str__(self) -> str:

@@ -1,6 +1,6 @@
 from enum import IntEnum
 from pathlib import Path
-from pydantic import BaseSettings
+from pydantic import BaseSettings, PyObject
 
 
 class Verbosity(IntEnum):
@@ -13,6 +13,8 @@ class Verbosity(IntEnum):
 
 
 class Settings(BaseSettings):
+    """General Golem-GPT settings."""
+
     GOLEM_DEBUG: bool = False
     WORKDIR: Path = Path("workdir")
     VERBOSITY_MAIN: Verbosity = Verbosity.NORMAL
@@ -20,7 +22,10 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str = ""
     OPENAI_ORG_ID: str = ""
-    OPENAI_MODEL: str = "gpt-4-turbo"
+    OPENAI_MODEL: str = "gpt-4o-mini"
+
+    CODEX_CLASS: PyObject = "golemgpt.codex.ReasonableCodex"
+    RUNNER_CLASS: PyObject = "golemgpt.runners.JustDoRunner"
 
     BING_SEARCH_API_KEY: str = ""
 

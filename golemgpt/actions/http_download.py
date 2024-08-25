@@ -2,7 +2,7 @@ from secrets import token_hex
 from time import time
 from typing import Optional, Union
 from golemgpt.utils.misc import workpath
-from golemgpt.utils.http import http_download
+from golemgpt.utils.http import http_download, RequestError
 
 HTTP_REQUEST_PROMPT = """
 Response saved to {out_filename} ({file_size} bytes).
@@ -25,14 +25,17 @@ def http_download_action(
     except ValueError:
         return f"File {out_filename} is outside of working dir."
 
-    response = http_download(
-        method=method, url=url, path=path, headers=headers,
-        json=body if isinstance(body, (dict, list)) else None,
-        body=body if isinstance(body, str) else None,
-    )
+    try:
+        response = http_download(
+            method=method, url=url, path=path, headers=headers,
+            json=body if isinstance(body, (dict, list)) else None,
+            body=body if isinstance(body, str) else None,
+        )
+    except RequestError as error:
+        return f"HTTP request failed: {error}"
 
     if response.status in (401, 403):
-        return "HTTP request failed: maybe ask user for credentials?"
+        return "HTTP request unauthorized: let's ask user for credentials?"
 
     file_size = path.stat().st_size
     return HTTP_REQUEST_PROMPT.format(

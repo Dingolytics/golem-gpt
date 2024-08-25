@@ -2,8 +2,8 @@ name: Publish / PyPI
 
 on:
   push:
-    branches:
-      - 'main'
+    # branches:
+    #   - 'main'
     tags:
       - 'v*'
     paths-ignore:

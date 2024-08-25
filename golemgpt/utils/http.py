@@ -1,8 +1,13 @@
 from typing import Any, Dict, Optional, Union
 from json import dumps as json_dumps, loads as json_loads
 import urllib3
+import urllib3.exceptions
 
 http = urllib3.PoolManager()
+
+RequestError = urllib3.exceptions.RequestError
+
+DEFAULT_TIMEOUT = 30.0
 
 
 def _do_request(
@@ -24,6 +29,7 @@ def http_request_streamed(
     json: Optional[Any] = None, **kwargs: Any
 ) -> urllib3.HTTPResponse:
     """Send an HTTP request without preloading, i.e. streamed."""
+    kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
     return _do_request(
         method=method, url=url, headers=headers, json=json,
         preload_content=False, **kwargs
