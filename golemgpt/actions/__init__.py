@@ -38,7 +38,7 @@ ALL_KNOWN_ACTIONS = {
     # "explain": explain_action,
     #
     "ask_human_input": ask_human_input_action,
-    "delegate_job": delegate_job_action,
+    # "delegate_job": delegate_job_action,
     "reject_job": reject_job_action,
     "finish_job": finish_job_action,
     #

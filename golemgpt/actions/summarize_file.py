@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from golemgpt.utils import console, workpath
 from .write_file import write_file_action
 
-MAX_RAW_SIZE = 32768
+MAX_RAW_SIZE = 65536 * 2  # 65K tokens for GPT-4o-mini
 
 
 def distill_html_file(path: Path, indent: int = 0) -> str:
@@ -68,11 +68,8 @@ def summarize_file_action(
             content = file.read()
         content = content[:MAX_RAW_SIZE]
 
-    cognitron = golem.cognitron()
-    prompt = f"Summarize the text, use the hint '{hint}':\n\n{content}"
-
-    console.info(f"Prompt: {prompt}")
-
+    cognitron = golem.cognitron(name="Summarizer")
+    prompt = f"{hint.rstrip('.')}. From the following text:\n\n{content}"
     reply = cognitron.communicate(prompt)
     reply_text = reply.text
     out_filename = f"summarized_{int(time())}_{filename}.txt"
