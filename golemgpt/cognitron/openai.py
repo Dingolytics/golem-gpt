@@ -108,6 +108,11 @@ class OpenAIToolsCognitron(BaseCognitron):
         """
         tools = []
 
+        def _extract_type(annotation: Any) -> str:
+            if hasattr(annotation, "__args__"):
+                return annotation.__args__[0].__name__
+            return annotation.__name__
+
         def _json_type(name: str) -> str:
             types_map = {
                 "str": "string",
@@ -124,7 +129,7 @@ class OpenAIToolsCognitron(BaseCognitron):
                 parameters = {
                     "type": "object",
                     "properties": {
-                        name: {"type": _json_type(arg.annotation.__name__)}
+                        name: {"type": _json_type(_extract_type(arg.annotation))}
                         for name, arg in signature.parameters.items()
                     },
                 }

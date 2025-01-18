@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     CODEX_CLASS: PyObject = "golemgpt.codex.ReasonableCodex"
     RUNNER_CLASS: PyObject = "golemgpt.runners.JustDoRunner"
 
-    BING_SEARCH_API_KEY: str = ""
+    BRAVE_SEARCH_API_KEY: str = ""
 
     class Config:
         env_file = ".env"

@@ -10,7 +10,7 @@ from .read_file import read_file_action
 from .reject_job import reject_job_action
 from .run_script import run_script_action
 from .search_images_via_bing import search_images_via_bing_action
-from .search_text_via_bing import search_text_via_bing_action
+from .search_text_via_brave import search_text_via_brave_action
 from .summarize_file import summarize_file_action
 from .write_file import write_file_action
 
@@ -42,8 +42,8 @@ ALL_KNOWN_ACTIONS = {
     "reject_job": reject_job_action,
     "finish_job": finish_job_action,
     #
-    "search_images_online": search_images_via_bing_action,
-    "search_text_via_bing_action": search_text_via_bing_action,
+    # "search_images_online": search_images_via_bing_action,
+    "search_text_via_brave": search_text_via_brave_action,
     #
     "reply_yes_or_no": reply_yes_or_no,
 }

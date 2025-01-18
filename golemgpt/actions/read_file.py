@@ -9,12 +9,9 @@ def read_file_action(filename: str, **kwargs) -> str:
     path = workpath(filename, check_exists=True)
     file_size = path.stat().st_size
     if file_size > MAX_RAW_SIZE:
-        hint = kwargs.get('summazie_hint') or "essential data is needed"
+        hint = kwargs.get("summazie_hint") or "Extract essential data"
         return summarize_file_action(
             filename, hint=hint, **kwargs
         )
-        # raise PathRejected(
-        #     f"Error, file '{filename}' is too large ({file_size} bytes)."
-        # )
     with path.open("r") as file:
         return file.read()

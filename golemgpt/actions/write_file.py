@@ -2,7 +2,7 @@ from json import dumps as json_dumps
 from golemgpt.utils import workpath
 
 
-def write_file_action(filename: str, content: str, **kwargs) -> str:
+def write_file_action(filename: str, content: str | dict, **kwargs) -> str:
     """Write a text file."""
     path = workpath(filename)
 
