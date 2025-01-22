@@ -1,9 +1,10 @@
-from golemgpt.actions import ALL_KNOWN_ACTIONS
 from golemgpt.codex import BaseCodex
+from golemgpt.runners.base import BaseRunner
 from golemgpt.settings import Settings
 from golemgpt.memory import BaseMemory
 from golemgpt.utils import console, genkey
 from golemgpt.cognitron.base import BaseCognitron
+from golemgpt.types import ActionFn, ActionItem
 
 from golemgpt.cognitron.openai import OpenAIToolsCognitron
 from golemgpt.utils.exceptions import (
@@ -26,20 +27,22 @@ class GeneralGolem:
     def __init__(
         self,
         *,
-        name=DEFAULT_NAME,
+        name: str = DEFAULT_NAME,
         goals: list[str],
         job_key: str,
         memory: BaseMemory,
         settings: Settings,
+        actions: dict[str, ActionFn],
     ) -> None:
         self.name = name
-        self.action_plan = []
+        self.actions = actions
+        self.plan: list[ActionItem] = []
         self.job_key = job_key
         self.goals = goals
         self.memory = memory
         self.settings = settings
         self.codex_class = settings.CODEX_CLASS
-        self.runner = settings.RUNNER_CLASS(settings)
+        self.runner_class = settings.RUNNER_CLASS
         self.core = self.cognitron()
 
     def __str__(self) -> str:
@@ -57,9 +60,9 @@ class GeneralGolem:
         while True:
             try:
                 if outcome:
-                    new_action_plan = self.plan_actions(outcome)
-                    self.align_actions(new_action_plan)
-                    self.action_plan = new_action_plan
+                    new_plan = self.plan_actions(outcome)
+                    self.align_actions(new_plan)
+                    self.plan = new_plan
                 outcome = self.run_action()
             except JobFinished:
                 break
@@ -101,7 +104,7 @@ class GeneralGolem:
         return self.cognitron_class(
             settings=self.settings,
             memory=memory,
-            actions=ALL_KNOWN_ACTIONS,
+            actions=self.actions,
             verbosity=self.settings.VERBOSITY_MAIN,
             **options,
         )
@@ -116,12 +119,17 @@ class GeneralGolem:
             memory=self.memory.spawn(key)
         )  # fmt: skip
 
+    def runner(self) -> BaseRunner:
+        """Return a new Runner instance."""
+        return self.runner_class(settings=self.settings, known_actions=self.actions)
+
     def run_action(self) -> str:
         """Run the next action in the plan."""
-        if not self.action_plan:
+        if not self.plan:
             raise JobFinished()
-        action_item = self.action_plan.pop(0)
-        action, result = self.runner(action_item, golem=self)
+        runner = self.runner()
+        action_item = self.plan.pop(0)
+        action, result = runner(action_item, golem=self)
         if not result:
             return ""
         return self.core.lexicon.action_result_prompt(action, result)
