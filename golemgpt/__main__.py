@@ -1,9 +1,10 @@
 import argparse
 import readline  # noqa
 
-from golemgpt.settings import Settings
-from golemgpt.memory.localfiles import LocalFilesMemory
+from golemgpt.actions import GENERAL_ACTIONS
 from golemgpt.golems.general import GeneralGolem
+from golemgpt.memory.localfiles import LocalFilesMemory
+from golemgpt.settings import Settings
 from golemgpt.utils import chdir, console, genkey
 
 
@@ -30,22 +31,31 @@ def main():
     memory.load(job_key)
     goals = memory.goals
 
+    goals = [
+        "Get weather in Batumi, Georgia. Use Celsius. "
+        "Save results in human readable format."
+    ]
+
+    # goals = [
+    #     "Get best offers for dedicated servers in the USA, need at least 1 Tb "
+    #     "of storage and 1 Gbps of bandwidth. Save results in human readable format."
+    # ]
+
     while not goals:
         goal = input("Enter a goal for the Golem-GPT:\n?> ").strip()
         if goal:
             goals.append(goal)
-    # goals = [
-    #     "Get weather in Batumi, Georgia. "
-    #     "Write results in human readable format."
-    # ]
 
     golem = GeneralGolem(
         goals=goals,
         job_key=job_key,
         memory=memory,
         settings=settings,
+        actions=GENERAL_ACTIONS,
     )
+
     with chdir(outdir):
+        console.info(f"Working directory: {outdir}")
         golem.start_job()
 
 
