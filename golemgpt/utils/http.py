@@ -17,8 +17,16 @@ def _do_request(
     """Send an HTTP request helper."""
     if json:
         headers = headers or {}
-        headers['content-type'] = 'application/json'
-        kwargs['body'] = json_dumps(json)
+        headers.update({
+            "content-type": "application/json",
+            # "user-agent": (
+            #     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            #     "AppleWebKit/537.36 (KHTML, like Gecko) "
+            #     "Chrome/122.0.0.0 Safari/537.36"
+            # ),
+            # "DNT": "1",  # Do Not Track
+        })
+        kwargs["body"] = json_dumps(json)
     return http.request(
         method=method, url=url, headers=headers, **kwargs
     )

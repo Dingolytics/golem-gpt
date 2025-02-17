@@ -43,7 +43,10 @@ class GeneralGolem:
         self.settings = settings
         self.codex_class = settings.CODEX_CLASS
         self.runner_class = settings.RUNNER_CLASS
-        self.core = self.cognitron()
+        self.core = self.cognitron(
+            actions=actions,
+            verbosity=self.settings.VERBOSITY_MAIN,
+        )
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.job_key})"
@@ -56,28 +59,30 @@ class GeneralGolem:
 
         self.initialize()
 
-        outcome = self.core.lexicon.goal_prompt(self.goals[-1])
+        # Start loop with mocking output from goals.
+        output = self.core.lexicon.goal_prompt(self.goals[-1])
+
         while True:
             try:
-                if outcome:
-                    new_plan = self.plan_actions(outcome)
-                    self.align_actions(new_plan)
-                    self.plan = new_plan
-                outcome = self.run_action()
-            except JobFinished:
+                if output:
+                    proposed_plan = self.plan_actions(output)
+                    self.align_actions(proposed_plan)
+                    self.plan = proposed_plan
+                output = self.run_action()
+            except JobFinished as exc:
+                console.info(f"{exc} {self.job_key}")
                 break
-            except JobRejected:
+            except JobRejected as exc:
+                console.info(f"{exc} {self.job_key}")
                 break
-            except PathRejected:
+            except PathRejected as exc:
+                console.info(f"{exc} {self.job_key}")
                 break
             except AlignAcionsError as exc:
-                # TODO: Implement a retry plan mechanism after misalignment
-                console.info(f"Actions rejected: {exc}")
+                console.info(f"{exc} {self.job_key}")
                 break
             except GolemError as exc:
-                outcome = str(exc)
-
-        console.info(f"Job completed: {self.job_key}")
+                output = str(exc)
 
     def initialize(self) -> None:
         """Initialize the job state from memory or from scratch."""
@@ -95,7 +100,9 @@ class GeneralGolem:
 
         self.memory.save()
 
-    def cognitron(self, **options) -> BaseCognitron:
+    def cognitron(
+        self, actions: dict[str, ActionFn], **options
+    ) -> BaseCognitron:
         """Return a new Cognitron instance."""
         assert self.settings, "Error: settings must be initialized first."
         assert self.memory, "Error: memory must be initialized first."
@@ -104,8 +111,7 @@ class GeneralGolem:
         return self.cognitron_class(
             settings=self.settings,
             memory=memory,
-            actions=self.actions,
-            verbosity=self.settings.VERBOSITY_MAIN,
+            actions=actions,
             **options,
         )
 
@@ -121,7 +127,9 @@ class GeneralGolem:
 
     def runner(self) -> BaseRunner:
         """Return a new Runner instance."""
-        return self.runner_class(settings=self.settings, known_actions=self.actions)
+        return self.runner_class(
+            settings=self.settings, known_actions=self.actions
+        )
 
     def run_action(self) -> str:
         """Run the next action in the plan."""
@@ -144,6 +152,6 @@ class GeneralGolem:
             raise
         return action_plan
 
-    def align_actions(self, action_plan: list[dict]) -> list[str]:
+    def align_actions(self, action_plan: list[dict]) -> None:
         """Align the action plan with the codex."""
-        return self.codex().align_actions(action_plan)
+        self.codex().align_actions(action_plan)
