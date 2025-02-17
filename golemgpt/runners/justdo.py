@@ -11,9 +11,9 @@ class JustDoRunner(BaseRunner):
     def __call__(self, action_item: ActionItem, golem: Any) -> Tuple[str, str]:
         for key in action_item:
             if key not in self.known_actions:
-                raise UnknownAction(key)
+                raise UnknownAction(str(action_item))
             action_fn = self.known_actions[key]
             kwargs = action_item[key]
             result = action_fn(golem=golem, **kwargs)
-            break
-        return (key, result)
+            return (key, result)
+        raise UnknownAction(str(action_item))

@@ -24,10 +24,10 @@ class Settings(BaseSettings):
     OPENAI_ORG_ID: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"
 
-    CODEX_CLASS: PyObject = "golemgpt.codex.ReasonableCodex"
-    RUNNER_CLASS: PyObject = "golemgpt.runners.JustDoRunner"
+    CODEX_CLASS: PyObject = "golemgpt.codex.ReasonableCodex"  # type: ignore
+    RUNNER_CLASS: PyObject = "golemgpt.runners.JustDoRunner"  # type: ignore
 
     BRAVE_SEARCH_API_KEY: str = ""
 
-    class Config:
+    class Config(BaseSettings.Config):
         env_file = ".env"

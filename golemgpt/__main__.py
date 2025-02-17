@@ -1,7 +1,7 @@
 import argparse
 import readline  # noqa
 
-from golemgpt.actions import GENERAL_ACTIONS
+from golemgpt.actions import GeneralActions
 from golemgpt.golems.general import GeneralGolem
 from golemgpt.memory.localfiles import LocalFilesMemory
 from golemgpt.settings import Settings
@@ -11,12 +11,14 @@ from golemgpt.utils import chdir, console, genkey
 def main():
     settings = Settings()
     console.set_debug(settings.GOLEM_DEBUG)
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-j', '--job-key', metavar='JOB_KEY',
-        type=str, default=genkey(),
-        required=False
+        "-j",
+        "--job-key",
+        metavar="JOB_KEY",
+        type=str,
+        default=genkey(),
+        required=False,
     )
     args = parser.parse_args()
 
@@ -24,7 +26,7 @@ def main():
     console.info(f"Job key: {job_key}")
 
     workdir = settings.WORKDIR.absolute()
-    outdir = workdir / job_key / 'output'
+    outdir = workdir / job_key / "output"
     outdir.mkdir(parents=True, exist_ok=True)
 
     memory = LocalFilesMemory(workdir)
@@ -41,6 +43,13 @@ def main():
     #     "of storage and 1 Gbps of bandwidth. Save results in human readable format."
     # ]
 
+    goals = [
+        "Get the price for LEGO collection 75342 (Star Wars). "
+        "Verify the offers found via search are valid. "
+        "Save results in human readable format. "
+        "Skip unavailable resources."
+    ]
+
     while not goals:
         goal = input("Enter a goal for the Golem-GPT:\n?> ").strip()
         if goal:
@@ -51,7 +60,7 @@ def main():
         job_key=job_key,
         memory=memory,
         settings=settings,
-        actions=GENERAL_ACTIONS,
+        actions=GeneralActions.get_actions(),
     )
 
     with chdir(outdir):
@@ -59,7 +68,7 @@ def main():
         golem.start_job()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:

@@ -52,11 +52,11 @@ class ReasonableCodex(BaseCodex):
         prompt += f"ACTIONS: {actions_summary}"
         return self.cognitron.lexicon.yesno_prompt(prompt), False
 
-    def align_actions(self, actions: list[dict]) -> bool:
+    def align_actions(self, actions: list[dict]) -> None:
         """Check if the actions are reasonably safe to perform."""
 
         if self.is_job_finished(actions):
-            return True
+            return
 
         check_actions = actions[: self.check_actions_depth]
         prompt, answer_expected = self.align_actions_prompt(check_actions)
@@ -67,6 +67,6 @@ class ReasonableCodex(BaseCodex):
         answer_real = self.cognitron.ask_yesno(prompt)
         if answer_expected == answer_real:
             console.message(self.name, self.message_ok, tags=["align"])
-            return True
+            return
 
         raise AlignAcionsError(prompt)
