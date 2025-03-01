@@ -127,9 +127,7 @@ class GeneralGolem:
 
     def runner(self) -> BaseRunner:
         """Return a new Runner instance."""
-        return self.runner_class(
-            settings=self.settings, known_actions=self.actions
-        )
+        return self.runner_class(self)
 
     def run_action(self) -> str:
         """Run the next action in the plan."""
@@ -137,7 +135,7 @@ class GeneralGolem:
             raise JobFinished()
         runner = self.runner()
         action_item = self.plan.pop(0)
-        action, result = runner(action_item, golem=self)
+        action, result = runner(action_item)
         if not result:
             return ""
         return self.core.lexicon.action_result_prompt(action, result)
