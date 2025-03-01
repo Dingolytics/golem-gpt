@@ -9,5 +9,5 @@ class BaseCodex:
         self.memory = memory
         self.settings = settings
 
-    def align_actions(self, action_plan: list) -> None:
+    def align_actions(self, actions: list) -> None:
         raise NotImplementedError()

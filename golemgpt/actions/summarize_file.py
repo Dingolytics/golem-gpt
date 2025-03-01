@@ -1,5 +1,6 @@
-from time import time
+from json import loads as json_loads
 from pathlib import Path
+from time import time
 
 from bs4 import BeautifulSoup
 from golemgpt.utils import console, workpath
@@ -42,8 +43,8 @@ def distill_html_file(path: Path, indent: int = 0) -> str:
                 current_depth -= 1
             ref_depth = depth
             # Add indented text
-            text.append(' ' * (current_depth * indent) + content.strip())
-        return '\n'.join(text)
+            text.append(" " * (current_depth * indent) + content.strip())
+        return "\n".join(text)
 
 
 def distill_file_known_formats(path: Path) -> str | None:
@@ -53,12 +54,11 @@ def distill_file_known_formats(path: Path) -> str | None:
     return None
 
 
-def summarize_file_action(
-    filename: str, hint: str, **kwargs
-) -> str:
+def summarize_file_action(filename: str, hint: str, **kwargs) -> str:
     # TODO: Better way to import for type checking
     from golemgpt.golems import GeneralGolem  # noqa
-    golem = kwargs['golem']  # type: GeneralGolem
+
+    golem = kwargs["golem"]  # type: GeneralGolem
     # TODO: Split file into chunks for summarization
     path = workpath(filename, check_exists=True)
 
@@ -68,10 +68,17 @@ def summarize_file_action(
             content = file.read()
         content = content[:MAX_RAW_SIZE]
 
-    cognitron = golem.cognitron(name="Summarizer")
+    cognitron = golem.cognitron(
+        name="Summarizer", actions={"write_file": write_file_action}
+    )
     prompt = f"{hint.rstrip('.')}. From the following text:\n\n{content}"
     reply = cognitron.communicate(prompt)
-    reply_text = reply.text
-    out_filename = f"summarized_{int(time())}_{filename}.txt"
+    arguments = {}
 
-    return write_file_action(out_filename, reply_text)
+    for action in reply.actions:
+        if action["function"]["name"] == "write_file":
+            arguments.update(json_loads(action["function"]["arguments"]))
+
+    arguments["filename"] = f"summarized_{int(time())}_{filename}.txt"
+
+    return write_file_action(**arguments)

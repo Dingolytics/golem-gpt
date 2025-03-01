@@ -32,7 +32,7 @@ class BraveSearchClient:
         offset: int = 0,
         search_lang: str | None = None,
         country: str | None = None,
-    ) -> dict:
+    ) -> list:
         headers = {
             "Accept": "application/json",
             "Accept-Encoding": "gzip",
@@ -66,7 +66,6 @@ class BraveSearchClient:
         # 'city': '', 'header_country': '', 'more_results_available': True,
         # 'state': ''}
 
-        print(raw_results["web"]["results"][0].keys())
         # ['title', 'url', 'is_source_local', 'is_source_both', 'description',
         # 'page_age', 'profile', 'language', 'family_friendly', 'type', 'subtype',
         # 'is_live', 'meta_url', 'thumbnail', 'age', 'extra_snippets']
@@ -77,6 +76,7 @@ class BraveSearchClient:
                 "url": item["url"],
                 "description": item["description"]
             })
+
         return formatted_results
 
 

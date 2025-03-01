@@ -174,6 +174,7 @@ class OpenAIToolsCognitron(BaseCognitron):
 
     def communicate(self, message: str, **options) -> Reply:
         """Communicate with the OpenAI and return the reply."""
+
         max_tokens = options.get("max_tokens", self.MAX_TOKENS)
         temperature = options.get("temperature", self.TEMPERATURE)
         messages = self.memory.messages.copy()
