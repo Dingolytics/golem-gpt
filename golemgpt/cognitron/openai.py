@@ -7,7 +7,7 @@ from golemgpt.memory import BaseMemory
 from golemgpt.settings import Settings, Verbosity
 from golemgpt.utils import console
 from golemgpt.utils.exceptions import UnknownAction, UnknownReplyFormat
-from golemgpt.utils.http import http_request
+from golemgpt.utils.http import http_request_as_json
 from .base import BaseCognitron
 
 
@@ -51,8 +51,7 @@ class OpenAIWithToolsLexicon(BaseLexicon):
         try:
             name = item["function"]["name"]
         except KeyError:
-            if self.verbosity >= Verbosity.COMPACT:
-                console.info(f"Unknown action: {item}")
+            console.error(f"Unknown action: {item}")
 
         try:
             args = json_loads(item["function"]["arguments"])
@@ -71,7 +70,6 @@ class OpenAIToolsCognitron(BaseCognitron):
 
     The main difference from `OpenAINaiveCognitron` is that we always
     get only one next action instead of multi-step action plan.
-
     """
 
     DEFAULT_NAME = "OpenAI-Tools"
@@ -85,7 +83,7 @@ class OpenAIToolsCognitron(BaseCognitron):
         settings: Settings,
         memory: BaseMemory,
         verbosity: Verbosity = Verbosity.NORMAL,
-        **options
+        **options,
     ) -> None:
         super().__init__(settings, memory, **options)
         self.headers = {
@@ -129,7 +127,9 @@ class OpenAIToolsCognitron(BaseCognitron):
                 parameters = {
                     "type": "object",
                     "properties": {
-                        name: {"type": _json_type(_extract_type(arg.annotation))}
+                        name: {
+                            "type": _json_type(_extract_type(arg.annotation))
+                        }
                         for name, arg in signature.parameters.items()
                     },
                 }
@@ -148,6 +148,13 @@ class OpenAIToolsCognitron(BaseCognitron):
             )
         return tools
 
+    def parse_tool_call(self, item: dict) -> tuple[str, dict]:
+        """
+        Extract the function name and its arguments from a tool call item.
+        """
+        assert isinstance(self.lexicon, OpenAIWithToolsLexicon)
+        return self.lexicon.parse_tool_call(item)
+
     def plan_actions(self, prompt: str, attempt: int = 0) -> list[dict]:
         """
         Plan actions based on the prompt using with use of tools.
@@ -155,7 +162,6 @@ class OpenAIToolsCognitron(BaseCognitron):
         We communicate the list of tools available via OpenAI call. We get
         the list of suggested calls in the reply. Actually it's a single-item
         list because that's how OpenAI's tools feature works currently.
-
         """
         if self.verbosity >= Verbosity.COMPACT:
             console.message(self.name, prompt, tags=["prompt"])
@@ -163,7 +169,7 @@ class OpenAIToolsCognitron(BaseCognitron):
         actions: list[dict] = []
 
         for item in reply.actions:
-            name, args = self.lexicon.parse_tool_call(item)
+            name, args = self.parse_tool_call(item)
             if name:
                 actions.append({name: args})
 
@@ -173,8 +179,9 @@ class OpenAIToolsCognitron(BaseCognitron):
         return actions
 
     def communicate(self, message: str, **options) -> Reply:
-        """Communicate with the OpenAI and return the reply."""
-
+        """
+        Communicate with the OpenAI and return the reply.
+        """
         max_tokens = options.get("max_tokens", self.MAX_TOKENS)
         temperature = options.get("temperature", self.TEMPERATURE)
         messages = self.memory.messages.copy()
@@ -210,7 +217,7 @@ class OpenAIToolsCognitron(BaseCognitron):
         if max_tokens:
             payload.update({"max_tokens": max_tokens})
 
-        result = http_request(
+        result = http_request_as_json(
             url=self.COMPLETIONS_URL,
             method="POST",
             headers=self.headers,
