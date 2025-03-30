@@ -46,8 +46,9 @@ def main():
     goals = [
         "Get the price for LEGO collection 75342 (Star Wars). "
         "Verify the offers found via search are valid. "
-        "Save results in human readable format. "
-        "Skip unavailable resources."
+        "Real numbers needed, not just links to websites. "
+        "Skip unavailable resources. "
+        "Summarize results in human readable format with pricing details in a single file."
     ]
 
     while not goals:

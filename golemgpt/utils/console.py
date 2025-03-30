@@ -32,6 +32,10 @@ def message(author: str, text: str, tags: list[str] | None = None) -> None:
     print("")
 
 
+def error(text: str) -> None:
+    cprint(text, "red")
+
+
 def info(text: str) -> None:
     cprint(text, "cyan")
 

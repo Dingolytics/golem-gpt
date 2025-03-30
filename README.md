@@ -159,6 +159,14 @@ python -m golemgpt -j <job key>
 Terminate simply with ^C or empty input.
 
 
+Code formatting convention:
+
+
+```
+ruff format --line-length 80
+```
+
+
 License
 -------
 
