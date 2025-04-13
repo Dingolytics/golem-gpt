@@ -36,7 +36,7 @@ class BraveSearchClient:
         headers = {
             "Accept": "application/json",
             "Accept-Encoding": "gzip",
-            "X-Subscription-Token": self.api_key
+            "X-Subscription-Token": self.api_key,
         }
         params = {
             "q": query,
@@ -71,16 +71,18 @@ class BraveSearchClient:
         # 'is_live', 'meta_url', 'thumbnail', 'age', 'extra_snippets']
 
         for item in raw_results.get("web", {}).get("results", []):
-            formatted_results.append({
-                "title": item["title"],
-                "url": item["url"],
-                "description": item["description"]
-            })
+            formatted_results.append(
+                {
+                    "title": item["title"],
+                    "url": item["url"],
+                    "description": item["description"],
+                }
+            )
 
         return formatted_results
 
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     import os
 
     api_key = os.environ.get("BRAVE_SEARCH_API_KEY")

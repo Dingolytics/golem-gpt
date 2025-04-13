@@ -12,15 +12,15 @@ def run_script_action(name: str, **kwargs) -> str:
             "Use a proper extension like .sh or .py for saved file."
         )
 
-    if name.endswith('.py'):
-        process = Popen(['python', name], stdout=PIPE, stderr=PIPE)
-    elif name.endswith('.sh'):
-        process = Popen(['sh', name], stdout=PIPE, stderr=PIPE)
+    if name.endswith(".py"):
+        process = Popen(["python", name], stdout=PIPE, stderr=PIPE)
+    elif name.endswith(".sh"):
+        process = Popen(["sh", name], stdout=PIPE, stderr=PIPE)
     else:
         return f"Rejected: script {name} is not a Bash or Python script."
 
     output, error = process.communicate()
-    is_ok = (process.returncode == 0)
+    is_ok = process.returncode == 0
 
     if isinstance(output, bytes):
         output = output.decode("utf-8")
@@ -30,6 +30,6 @@ def run_script_action(name: str, **kwargs) -> str:
 
     return (
         f"Script {name} executed successfully. Output:\n{output}"
-        if is_ok else
-        f"Script {name} failed. Error:\n{error}"
+        if is_ok
+        else f"Script {name} failed. Error:\n{error}"
     )

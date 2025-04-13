@@ -1,6 +1,5 @@
 from secrets import token_hex
 from time import time
-from typing import Optional, Union
 from golemgpt.utils.misc import workpath
 from golemgpt.utils.http import http_download, RequestError
 
@@ -10,10 +9,12 @@ Response saved to {out_filename} ({file_size} bytes).
 
 
 def http_download_action(
-    url: str, method: str = "GET", out_filename: str = "",
-    headers: Optional[dict] = None,
-    body: Union[str, list, dict] = None,
-    **kwargs
+    url: str,
+    method: str = "GET",
+    out_filename: str = "",
+    headers: dict | None = None,
+    body: str | list | dict | None = None,
+    **kwargs,
 ) -> str:
     """Make HTTP request, save result to file (JSON, PNG, PDF, etc.)"""
 
@@ -27,7 +28,10 @@ def http_download_action(
 
     try:
         response = http_download(
-            method=method, url=url, path=path, headers=headers,
+            method=method,
+            url=url,
+            path=str(path),
+            headers=headers,
             json=body if isinstance(body, (dict, list)) else None,
             body=body if isinstance(body, str) else None,
         )

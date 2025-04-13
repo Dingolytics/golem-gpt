@@ -9,9 +9,11 @@ and you will get results.
 Bypass already executed actions, use results provided.
 """.strip()
 
-INITIALIZER_REPLY_EXAMPLE = json_dumps([
-    {'ask_human_input': {'query': 'What is the goal?'}},
-]).strip()
+INITIALIZER_REPLY_EXAMPLE = json_dumps(
+    [
+        {"ask_human_input": {"query": "What is the goal?"}},
+    ]
+).strip()
 
 # - create_python_script: name, description, in_files, out_files
 # - create_shell_script: name, description, in_files, out_files

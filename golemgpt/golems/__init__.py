@@ -1,3 +1,3 @@
 from .general import GeneralGolem
 
-__all__ = ['GeneralGolem']
+__all__ = ["GeneralGolem"]

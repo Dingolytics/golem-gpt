@@ -24,6 +24,6 @@ class GeneralLexicon(BaseLexicon):
         prompt = self.initializer_prompt()
         reply = INITIALIZER_REPLY_EXAMPLE
         return [
-            {'role': 'user', 'content': prompt},
-            {'role': 'assistant', 'content': reply},
+            {"role": "user", "content": prompt},
+            {"role": "assistant", "content": reply},
         ]

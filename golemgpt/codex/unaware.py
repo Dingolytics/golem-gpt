@@ -1,4 +1,3 @@
-
 from golemgpt.utils import console
 from .base import BaseCodex
 

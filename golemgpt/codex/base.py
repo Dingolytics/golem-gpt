@@ -3,9 +3,7 @@ from golemgpt.settings import Settings
 
 
 class BaseCodex:
-    def __init__(
-        self, settings: Settings, memory: BaseMemory
-    ) -> None:
+    def __init__(self, settings: Settings, memory: BaseMemory) -> None:
         self.memory = memory
         self.settings = settings
 
