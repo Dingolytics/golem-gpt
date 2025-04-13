@@ -2,6 +2,7 @@ import inspect
 from json import loads as json_loads
 from typing import Any, Callable
 
+from golemgpt.handlers.base import BaseHandler
 from golemgpt.lexicon import BaseLexicon, Reply
 from golemgpt.memory import BaseMemory
 from golemgpt.settings import Settings, Verbosity
@@ -59,6 +60,37 @@ class OpenAIWithToolsLexicon(BaseLexicon):
             pass
 
         return (name, args)
+
+
+def extract_fn_params_jsonschema(action_fn: Callable):
+    def _extract_type(annotation: Any) -> str:
+        if hasattr(annotation, "__args__"):
+            return annotation.__args__[0].__name__
+        return annotation.__name__
+
+    def _json_type(name: str) -> str:
+        types_map = {
+            "str": "string",
+            "float": "number",
+            "int": "number",
+            "bool": "boolean",
+            "dict": "object",
+        }
+        return types_map.get(name, "object")
+
+    signature = inspect.signature(action_fn)
+    parameters: dict[str, str | dict[str, Any]] = {}
+
+    if signature.parameters:
+        parameters = {
+            "type": "object",
+            "properties": {
+                name: {"type": _json_type(_extract_type(arg.annotation))}
+                for name, arg in signature.parameters.items()
+            },
+        }
+
+    return parameters
 
 
 class OpenAIToolsCognitron(BaseCognitron):
@@ -122,20 +154,15 @@ class OpenAIToolsCognitron(BaseCognitron):
             return types_map.get(name, "object")
 
         for key in actions:
-            signature = inspect.signature(actions[key])
-            if signature.parameters:
-                parameters = {
-                    "type": "object",
-                    "properties": {
-                        name: {
-                            "type": _json_type(_extract_type(arg.annotation))
-                        }
-                        for name, arg in signature.parameters.items()
-                    },
-                }
+            action_fn = actions[key]
+
+            if isinstance(action_fn, BaseHandler):
+                parameters = action_fn.get_params_jsonschema()
+                description = action_fn.get_description()
             else:
-                parameters = {}
-            description = actions[key].__doc__ or " ".join(key.split("_"))
+                parameters = extract_fn_params_jsonschema(action_fn)
+                description = actions[key].__doc__ or " ".join(key.split("_"))
+
             tools.append(
                 {
                     "type": "function",
@@ -146,6 +173,7 @@ class OpenAIToolsCognitron(BaseCognitron):
                     },
                 }
             )
+
         return tools
 
     def parse_tool_call(self, item: dict) -> tuple[str, dict]:

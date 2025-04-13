@@ -10,8 +10,6 @@ def read_file_action(filename: str, **kwargs) -> str:
     file_size = path.stat().st_size
     if file_size > MAX_RAW_SIZE:
         hint = kwargs.get("summazie_hint") or "Extract essential data"
-        return summarize_file_action(
-            filename, hint=hint, **kwargs
-        )
+        return summarize_file_action(filename, hint=hint, **kwargs)
     with path.open("r") as file:
         return file.read()

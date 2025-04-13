@@ -3,7 +3,7 @@ from .reasonable import ReasonableCodex
 from .unaware import UnawareCodex
 
 __all__ = [
-    'BaseCodex',
-    'ReasonableCodex',
-    'UnawareCodex',
+    "BaseCodex",
+    "ReasonableCodex",
+    "UnawareCodex",
 ]

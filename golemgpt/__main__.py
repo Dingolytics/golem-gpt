@@ -43,12 +43,17 @@ def main():
     #     "of storage and 1 Gbps of bandwidth. Save results in human readable format."
     # ]
 
+    # goals = [
+    #     "Get the price for LEGO collection 75342 (Star Wars). "
+    #     "Verify the offers found via search are valid. "
+    #     "Real numbers needed, not just links to websites. "
+    #     "Skip unavailable resources. "
+    #     "Summarize results in human readable format with pricing details in a single file."
+    # ]
+
     goals = [
-        "Get the price for LEGO collection 75342 (Star Wars). "
-        "Verify the offers found via search are valid. "
-        "Real numbers needed, not just links to websites. "
-        "Skip unavailable resources. "
-        "Summarize results in human readable format with pricing details in a single file."
+        "Find chess meme images about 'call the ambulance but not for me. "
+        "Download images locally. Get at least 10 images."
     ]
 
     while not goals:

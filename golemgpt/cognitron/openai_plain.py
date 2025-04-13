@@ -34,7 +34,7 @@ class OpenAITextCognitron(BaseCognitron):
         settings: Settings,
         memory: BaseMemory,
         verbosity: Verbosity = Verbosity.NORMAL,
-        **options
+        **options,
     ) -> None:
         super().__init__(settings, memory, **options)
         self.headers = {

@@ -14,7 +14,7 @@ class Reply(BaseModel):
 
 class BaseLexicon:
     # Not-a-JSON naive preamble regex:
-    naive_preamble_re = re_compile(r'([^\[\{]*)', DOTALL)
+    naive_preamble_re = re_compile(r"([^\[\{]*)", DOTALL)
 
     def initializer_prompt(self) -> str:
         return ""
@@ -25,7 +25,7 @@ class BaseLexicon:
             "Ask credentials from user if needed, be specific for which "
             "API endpoint you'll use it (exact address needed)."
         )
-        goal = goal.strip().rstrip('.')
+        goal = goal.strip().rstrip(".")
         return f"The goal is: {goal}.\n\n{tools_hint}"
 
     def yesno_prompt(self, question: str) -> str:

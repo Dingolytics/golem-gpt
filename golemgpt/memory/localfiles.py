@@ -6,20 +6,20 @@ from .base import BaseMemory
 class LocalFilesMemory(BaseMemory):
     def __init__(self, root_dir: Path) -> None:
         super().__init__()
-        self.config['root_dir'] = root_dir
+        self.config["root_dir"] = root_dir
 
     @property
     def root_dir(self) -> Path:
-        return self.config['root_dir']
+        return self.config["root_dir"]
 
     def get_path(self, filename: str) -> Path:
         assert self.key
         path = self.root_dir
-        for key_part in self.key.split('/'):
+        for key_part in self.key.split("/"):
             path = path / key_part
         return path / filename
 
-    def spawn(self, key: str) -> 'LocalFilesMemory':
+    def spawn(self, key: str) -> "LocalFilesMemory":
         """Spawn a fresh memory instance."""
         isinstance = LocalFilesMemory(self.root_dir)
         isinstance.load(key)
@@ -37,21 +37,21 @@ class LocalFilesMemory(BaseMemory):
         """Save JSON data to a local file."""
         path = self.get_path(filename)
         path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open('w') as file:
+        with path.open("w") as file:
             json_dump(data, file, indent=2, ensure_ascii=False)
 
     def load_messages(self) -> list:
         """Load the chat history from a local file."""
-        return self.load_file('messages.json', [])
+        return self.load_file("messages.json", [])
 
     def save_messages(self) -> None:
         """Save the chat history to a local file."""
-        self.save_file('messages.json', self.messages)
+        self.save_file("messages.json", self.messages)
 
     def load_goals(self) -> list:
         """Load the goals from a local file."""
-        return self.load_file('job.json', {}).get('goals', [])
+        return self.load_file("job.json", {}).get("goals", [])
 
     def save_goals(self) -> None:
         """Save the goals to a local file."""
-        return self.save_file('job.json', {'goals': self.goals})
+        return self.save_file("job.json", {"goals": self.goals})

@@ -56,7 +56,7 @@ class BaseMemory(BaseModel):
 
     def print_message(self, item: dict) -> None:
         """Print the last message in the chat history."""
-        role = item['role'].capitalize()
+        role = item["role"].capitalize()
         print(f"{role}:")
         print("-" * (1 + len(role)))
         print(item["content"].strip())
