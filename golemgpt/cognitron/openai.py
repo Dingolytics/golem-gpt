@@ -6,6 +6,7 @@ from golemgpt.handlers.base import BaseHandler
 from golemgpt.lexicon import BaseLexicon, Reply
 from golemgpt.memory import BaseMemory
 from golemgpt.settings import Settings, Verbosity
+from golemgpt.types import ActionFn
 from golemgpt.utils import console
 from golemgpt.utils.exceptions import UnknownAction, UnknownReplyFormat
 from golemgpt.utils.http import http_request_as_json
@@ -128,7 +129,7 @@ class OpenAIToolsCognitron(BaseCognitron):
 
     @classmethod
     def parse_actions_to_tools(
-        cls, actions: dict[str, Callable]
+        cls, actions: dict[str, ActionFn | type]
     ) -> list[dict[str, Any]]:
         """
         Parse known actions (callables with possible side-effects) to tools.
@@ -156,7 +157,8 @@ class OpenAIToolsCognitron(BaseCognitron):
         for key in actions:
             action_fn = actions[key]
 
-            if isinstance(action_fn, BaseHandler):
+            if isinstance(action_fn, type):
+                assert issubclass(action_fn, BaseHandler)
                 parameters = action_fn.get_params_jsonschema()
                 description = action_fn.get_description()
             else:

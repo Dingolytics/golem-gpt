@@ -17,8 +17,10 @@ class JustDoRunner(BaseRunner):
 
         action_fn = self.known_actions[key]
 
-        if isinstance(action_fn, BaseHandler):
-            output = action_fn(params)
+        if isinstance(action_fn, type):
+            assert issubclass(action_fn, BaseHandler)
+            handler = action_fn()
+            output = handler(params)
             result = output.result
         else:
             result = action_fn(golem=self.golem, **params)

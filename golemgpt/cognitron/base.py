@@ -1,9 +1,9 @@
 import json
-from typing import Callable
 
 from golemgpt.lexicon import BaseLexicon, Reply
 from golemgpt.memory import BaseMemory
 from golemgpt.settings import Settings
+from golemgpt.types import ActionFn
 
 
 class BaseCognitron:
@@ -15,7 +15,7 @@ class BaseCognitron:
         self,
         settings: Settings,
         memory: BaseMemory,
-        actions: dict[str, Callable],
+        actions: dict[str, ActionFn | type],
         name: str = "",
     ) -> None:
         self.settings = settings
