@@ -24,7 +24,7 @@ class BaseOutput(BaseModel):
           for potential retry. Defaults to an empty string.
     """
 
-    result: str
+    result: str = ""
     error_feedback: str = ""
 
 
@@ -81,7 +81,10 @@ class BaseHandler(Generic[P]):
     def __call__(self, params: dict[str, Any] | None) -> BaseOutput:
         params_validated: P | None = None
         if params:
-            params_validated = self.validate_params(params)
+            try:
+                params_validated = self.validate_params(params)
+            except Exception as exc:
+                return BaseOutput(error_feedback=str(exc))
 
         output = self.do_action(params_validated)
 

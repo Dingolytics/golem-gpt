@@ -1,7 +1,7 @@
 from json import dumps as json_dumps
 
 from golemgpt.settings import Settings
-from golemgpt.utils.http import http_request
+from golemgpt.utils.http import http_request_as_json
 
 BRAVE_SEARCH_API_URL = "https://api.search.brave.com/res/v1/web/search"
 
@@ -47,12 +47,11 @@ class BraveSearchClient:
             params["country"] = country
         if search_lang:
             params["search_lang"] = search_lang
-        raw_results = http_request(
+        raw_results = http_request_as_json(
             "GET",
             self.endpoint,
             headers=headers,
             fields=params,
-            json_result=True,
         )
         formatted_results = []
         # 'query', 'mixed', 'type', 'web'

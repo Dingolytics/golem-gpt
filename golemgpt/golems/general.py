@@ -10,7 +10,7 @@ from golemgpt.types import ActionFn, ActionItem
 
 from golemgpt.cognitron.openai import OpenAIToolsCognitron
 from golemgpt.utils.exceptions import (
-    GolemError,
+    WorkflowError,
     AlignAcionsError,
     JobFinished,
     JobRejected,
@@ -83,7 +83,7 @@ class GeneralGolem:
             except AlignAcionsError as exc:
                 console.info(f"{exc} {self.job_key}")
                 break
-            except GolemError as exc:
+            except WorkflowError as exc:
                 output = str(exc)
 
     def initialize(self) -> None:
