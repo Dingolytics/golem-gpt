@@ -1,19 +1,19 @@
 from json import JSONDecodeError
 
 
-class GolemError(Exception):
-    """Base class for all Golem errors."""
+class WorkflowError(Exception):
+    """Base class for all workflow errors."""
 
 
-class JobFinished(GolemError):
+class JobFinished(WorkflowError):
     """Exception to be raised when the job is finished."""
 
 
-class JobRejected(GolemError):
+class JobRejected(WorkflowError):
     """Exception to be raised when the job is rejected."""
 
 
-class PathRejected(GolemError, ValueError):
+class PathRejected(WorkflowError, ValueError):
     """Raised when a requested path is rejected."""
 
     def __init__(self, path: str, *args):
@@ -21,11 +21,11 @@ class PathRejected(GolemError, ValueError):
         super().__init__(*args)
 
 
-class UnknownReplyFormat(GolemError, RuntimeError):
+class UnknownReplyFormat(WorkflowError, RuntimeError):
     """Raised when reply format is unknown."""
 
 
-class UnknownAction(GolemError, RuntimeError):
+class UnknownAction(WorkflowError, RuntimeError):
     """Raised when unknown action is requested."""
 
     def __init__(self, name: str):
@@ -33,11 +33,11 @@ class UnknownAction(GolemError, RuntimeError):
         super().__init__(f"Unknown action: {name}.")
 
 
-class AlignAcionsError(GolemError):
+class AlignAcionsError(WorkflowError):
     """Exception to be raised when the action plan is rejected."""
 
 
-class ParseActionsError(GolemError, JSONDecodeError):
+class ParseActionsError(WorkflowError, JSONDecodeError):
     """Raised when actions plan cannot be parsed."""
 
     def __init__(self, msg: str, doc: str, pos: int = 0):

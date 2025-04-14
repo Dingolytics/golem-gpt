@@ -21,7 +21,8 @@ class JustDoRunner(BaseRunner):
             assert issubclass(action_fn, BaseHandler)
             handler = action_fn()
             output = handler(params)
-            result = output.result
+            # TODO: Somehow distinguish errors vs OK result.
+            result = output.result or output.error_feedback
         else:
             result = action_fn(golem=self.golem, **params)
 

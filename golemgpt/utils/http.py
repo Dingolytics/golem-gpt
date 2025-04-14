@@ -1,9 +1,11 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 from json import dumps as json_dumps, loads as json_loads
 import urllib3
 import urllib3.exceptions
 
 http = urllib3.PoolManager()
+
+BaseHTTPResponse = urllib3.BaseHTTPResponse
 
 RequestError = urllib3.exceptions.RequestError
 
@@ -16,7 +18,7 @@ def _do_request(
     headers: Optional[Dict[str, str]] = None,
     json: Optional[Any] = None,
     **kwargs: Any,
-) -> urllib3.BaseHTTPResponse:
+) -> BaseHTTPResponse:
     """Send an HTTP request helper."""
     if json:
         headers = headers or {}
@@ -41,7 +43,7 @@ def http_request_streamed(
     headers: Optional[Dict[str, str]] = None,
     json: Optional[Any] = None,
     **kwargs: Any,
-) -> urllib3.BaseHTTPResponse:
+) -> BaseHTTPResponse:
     """Send an HTTP request without preloading, i.e. streamed."""
     kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
     return _do_request(
@@ -61,7 +63,7 @@ def http_download(
     headers: Optional[Dict[str, str]] = None,
     json: Optional[Any] = None,
     **kwargs: Any,
-) -> urllib3.BaseHTTPResponse:
+) -> BaseHTTPResponse:
     """Download file via streamed HTTP request."""
     response = http_request_streamed(
         method=method, url=url, headers=headers, json=json, **kwargs
@@ -79,18 +81,13 @@ def http_request(
     json: Optional[Any] = None,
     json_result: bool = False,
     **kwargs: Any,
-) -> Union[Dict[str, Any], bytes]:
-    """Send an HTTP request and return parsed data."""
+) -> BaseHTTPResponse:
+    """Send an HTTP request and return response."""
     response = _do_request(
         method=method, url=url, headers=headers, json=json, **kwargs
     )
     if response.status == 200:
-        content_type = response.headers["content-type"]
-        # TODO: Guess more types if required (e.g. XML, CSV, query string)
-        json_result = json_result or content_type in ("application/json",)
-        if json_result:
-            return json_loads(response.data)
-        return response.data
+        return response
     raise RuntimeError(f"HTTP request failed: {response.data}")
 
 
@@ -99,11 +96,10 @@ def http_request_as_json(
     url: str,
     headers: Optional[Dict[str, str]] = None,
     json: Optional[Any] = None,
-    json_result: bool = False,
     **kwargs: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Send an HTTP request and return parsed data."""
-    data = http_request(
+    response = http_request(
         method=method,
         url=url,
         headers=headers,
@@ -111,5 +107,6 @@ def http_request_as_json(
         json_result=True,
         **kwargs,
     )
+    data = json_loads(response.data)
     assert isinstance(data, dict)
     return data
