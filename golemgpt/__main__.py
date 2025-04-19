@@ -52,8 +52,10 @@ def main():
     # ]
 
     goals = [
-        "Find chess meme images about 'call the ambulance but not for me. "
-        "Download images locally. Get at least 10 images."
+        "Find funny chess meme images about, use some creativity in search queries. "
+        "Download images locally. Get at least 10 images, and please avoid downloading "
+        "non-relevant stuff. Also avoid SVG files, prefer PNG ad JPEG. If download failed "
+        "just look for other sources."
     ]
 
     while not goals:
