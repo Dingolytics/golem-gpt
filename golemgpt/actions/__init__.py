@@ -8,6 +8,8 @@ from golemgpt.actions.run_script import run_script_action
 from golemgpt.actions.search_text_via_brave import search_text_via_brave_action
 from golemgpt.actions.summarize_file import summarize_file_action
 from golemgpt.actions.write_file import write_file_action
+from golemgpt.handlers.extract_images import ExtractImagesHandler
+from golemgpt.handlers.extract_links import ExtractLinksHandler
 from golemgpt.handlers.http_download import HttpDownloadHandler
 from golemgpt.types import ActionFn
 
@@ -26,6 +28,8 @@ class GeneralActions:
     @classmethod
     def get_actions(cls) -> dict[str, ActionFn | type]:
         return {
+            "extract_images": ExtractImagesHandler,
+            "extract_links": ExtractLinksHandler,
             "http_download": HttpDownloadHandler,
             #
             "read_file": read_file_action,
