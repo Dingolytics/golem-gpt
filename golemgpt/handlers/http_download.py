@@ -16,6 +16,11 @@ from golemgpt.utils.http import (
     http_request,
 )
 
+# Mapping to use "canonical" file extensions for output.
+EXT_ALIASES = {
+    ".jpeg": ".jpg",
+}
+
 
 class RequestTypeError(WorkflowError):
     pass
@@ -25,13 +30,17 @@ class HttpDownloadParams(BaseParams):
     url: str
     method: str = "GET"
     out_filename: str = ""
-    headers: dict = {}
+    headers: dict[str, str] = {}
     body: str | bytes | list | dict | None = None
 
     @field_validator("out_filename", mode="after")
-    def set_default_out_filename(cls, value: str) -> str:
+    @classmethod
+    def set_out_filename(cls, value: str) -> str:
         if not value.strip():
             return f"out_{int(time())}_{token_hex(12)}.txt"
+        for alias in EXT_ALIASES:
+            if value.lower().endswith(alias):
+                value = value[-len(alias):] + EXT_ALIASES[alias]
         return value
 
 
@@ -44,11 +53,18 @@ class HttpDownloadHandler(BaseHandler[HttpDownloadParams]):
 
     wrong_link_error = (
         "Error trying to download '{output_ext}' file "
-        "from '{guess_ext}' URL. Download file as {guess_ext} first "
+        "from '{content_ext}' URL. Download file as {guess_ext} first "
         "and then extract links using the provided summary tool."
     )
 
+    image_mismatch_error = (
+        "Error trying to download '{output_ext}' file "
+        "from '{content_ext}' URL."
+    )
+
     text_formats = (".html", ".txt")
+
+    image_formats = (".svg", ".png", ".jpg", ".heic", ".webp")
 
     def validate_params(self, params: dict[str, Any]) -> HttpDownloadParams:
         validated = super().validate_params(params)
@@ -60,13 +76,21 @@ class HttpDownloadHandler(BaseHandler[HttpDownloadParams]):
         content_type = content_type.rstrip(";")
 
         output_ext = Path(validated.out_filename).suffix.lower()
-        guess_ext = guess_extension(content_type)
+        content_ext = guess_extension(content_type)
 
         # TODO: More robust content types matching.
-        if guess_ext in self.text_formats:
+        if content_ext in self.text_formats:
             if output_ext not in self.text_formats:
                 error = self.wrong_link_error.format(
-                    guess_ext=guess_ext,
+                    content_ext=content_ext,
+                    output_ext=output_ext,
+                )
+                raise RequestTypeError(error)
+
+        if content_ext in self.image_formats:
+            if output_ext != content_ext:
+                error = self.image_mismatch_error.format(
+                    content_ext=content_ext,
                     output_ext=output_ext,
                 )
                 raise RequestTypeError(error)

@@ -1,5 +1,6 @@
-from typing import Any, Dict, Optional
 from json import dumps as json_dumps, loads as json_loads
+from typing import Any, Dict, Optional
+from urllib.parse import urlparse
 import urllib3
 import urllib3.exceptions
 
@@ -110,3 +111,20 @@ def http_request_as_json(
     data = json_loads(response.data)
     assert isinstance(data, dict)
     return data
+
+
+def is_http_url(url: str) -> bool:
+    parsed = urlparse(url)
+    return parsed.scheme in ("http", "https")
+
+
+def get_content_type(url: str) -> str:
+    """Get content type for the specified URL."""
+    try:
+        head_response = http_request(method="HEAD", url=url)
+    except Exception:
+        return ""
+    content_type = head_response.headers.get("content-type") or ""
+    content_type = content_type.split(" ")[0]
+    content_type = content_type.rstrip(";")
+    return content_type
