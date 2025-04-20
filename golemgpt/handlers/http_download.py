@@ -53,7 +53,7 @@ class HttpDownloadHandler(BaseHandler[HttpDownloadParams]):
 
     wrong_link_error = (
         "Error trying to download '{output_ext}' file "
-        "from '{content_ext}' URL. Download file as {guess_ext} first "
+        "from '{content_ext}' URL. Download file as {content_ext} first "
         "and then extract links using the provided summary tool."
     )
 

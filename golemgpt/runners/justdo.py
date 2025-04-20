@@ -17,10 +17,10 @@ class JustDoRunner(BaseRunner):
 
         action_fn = self.known_actions[key]
 
-        if isinstance(action_fn, type):
-            assert issubclass(action_fn, BaseHandler)
-            handler = action_fn()
-            output = handler(params)
+        if isinstance(action_fn, BaseHandler):
+            # assert issubclass(action_fn, BaseHandler)
+            # handler = action_fn()
+            output = action_fn(params)
             # TODO: Somehow distinguish errors vs OK result.
             result = output.result or output.error_feedback
         else:

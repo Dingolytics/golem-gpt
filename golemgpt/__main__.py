@@ -43,21 +43,21 @@ def main():
     #     "of storage and 1 Gbps of bandwidth. Save results in human readable format."
     # ]
 
-    # goals = [
-    #     "Get the price for LEGO collection 75342 (Star Wars). "
-    #     "Verify the offers found via search are valid. "
-    #     "Real numbers needed, not just links to websites. "
-    #     "Skip unavailable resources. "
-    #     "Summarize results in human readable format with pricing details in a single file."
-    # ]
-
     goals = [
-        "Find funny chess meme images about, use some creativity "
-        "in search queries. Get at least 10 images, and please avoid "
-        "downloading non-relevant images. Also avoid SVG and GIF files, "
-        "prefer PNG ad JPEG. If download failed just look for other sources. "
-        "Download images themselves and also put URLs it text file."
+        "Get the price for LEGO collection 75342 (Star Wars). "
+        "Verify the offers found via search are valid. "
+        "Real numbers needed, not just links to websites. "
+        "Skip unavailable resources. "
+        "Summarize results in human readable format with pricing details in a single file."
     ]
+
+    # goals = [
+    #     "Find funny chess meme images about, use some creativity "
+    #     "in search queries. Get at least 10 images, and please avoid "
+    #     "downloading non-relevant images. Also avoid SVG and GIF files, "
+    #     "prefer PNG ad JPEG. If download failed just look for other sources. "
+    #     "Download images themselves and also put URLs it text file."
+    # ]
 
     while not goals:
         goal = input("Enter a goal for the Golem-GPT:\n?> ").strip()
@@ -69,7 +69,7 @@ def main():
         job_key=job_key,
         memory=memory,
         settings=settings,
-        actions=GeneralActions.get_actions(),
+        actions=GeneralActions.get_actions(settings),
     )
 
     with chdir(outdir):
