@@ -11,6 +11,12 @@
 *.log
 *.tmp
 
+# IDE settings
+.idea
+.zed
+.vscode
+.ropeproject
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
