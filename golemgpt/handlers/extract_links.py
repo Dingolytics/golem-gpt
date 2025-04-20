@@ -15,7 +15,7 @@ class ClickableLink(BaseModel):
 
 def extract_links_from_html(content: str) -> list[ClickableLink]:
     soup = BeautifulSoup(content, "html.parser")
-    links = []
+    links: list[ClickableLink] = []
 
     a_tags: list[PageElement] = soup.find_all("a", href=True)
     for tag in a_tags:
@@ -33,7 +33,7 @@ class ExtractLinksParams(BaseParams):
     filename: str
 
 
-class ExtractLinksHandler(BaseHandler):
+class ExtractLinksHandler(BaseHandler[ExtractLinksParams]):
     params_cls = ExtractLinksParams
 
     description = "Extract clickable links from HTML file."
