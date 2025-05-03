@@ -52,8 +52,8 @@ class HttpDownloadHandler(BaseHandler[HttpDownloadParams]):
     success_prompt = "Response saved to {out_filename} ({file_size} bytes)."
 
     wrong_link_error = (
-        "Error trying to download '{output_ext}' file "
-        "from '{content_ext}' URL. Download file as {guess_ext} first "
+        "Error trying to download '{out_filename}' file "
+        "from '{content_ext}' URL. Download file as {content_ext} first "
         "and then extract links using the provided summary tool."
     )
 
@@ -83,7 +83,7 @@ class HttpDownloadHandler(BaseHandler[HttpDownloadParams]):
             if output_ext not in self.text_formats:
                 error = self.wrong_link_error.format(
                     content_ext=content_ext,
-                    output_ext=output_ext,
+                    out_filename=validated.out_filename,
                 )
                 raise RequestTypeError(error)
 

@@ -1,6 +1,6 @@
 from golemgpt.codex import BaseCodex
 
-# from golemgpt.handlers.base import BaseHandler
+from golemgpt.handlers.base import BaseHandler
 from golemgpt.runners.base import BaseRunner
 from golemgpt.settings import Settings
 from golemgpt.memory import BaseMemory
@@ -34,7 +34,7 @@ class GeneralGolem:
         job_key: str,
         memory: BaseMemory,
         settings: Settings,
-        actions: dict[str, ActionFn | type],
+        actions: dict[str, ActionFn | BaseHandler],
     ) -> None:
         self.name = name
         self.actions = actions
@@ -103,7 +103,7 @@ class GeneralGolem:
         self.memory.save()
 
     def cognitron(
-        self, actions: dict[str, ActionFn | type], **options
+        self, actions: dict[str, ActionFn | BaseHandler], **options
     ) -> BaseCognitron:
         """Return a new Cognitron instance."""
         assert self.settings, "Error: settings must be initialized first."

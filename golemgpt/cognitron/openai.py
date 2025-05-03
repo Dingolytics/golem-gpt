@@ -1,5 +1,5 @@
 import inspect
-from json import loads as json_loads
+from json import loads as json_loads, dumps as json_dumps
 from typing import Any, Callable
 
 from golemgpt.handlers.base import BaseHandler
@@ -127,6 +127,8 @@ class OpenAIToolsCognitron(BaseCognitron):
         self.tools = self.parse_actions_to_tools(self.actions)
         self.verbosity = verbosity
 
+        console.info(json_dumps(self.tools, indent=2))
+
     @classmethod
     def parse_actions_to_tools(
         cls, actions: dict[str, ActionFn | type]
@@ -139,26 +141,10 @@ class OpenAIToolsCognitron(BaseCognitron):
         """
         tools = []
 
-        def _extract_type(annotation: Any) -> str:
-            if hasattr(annotation, "__args__"):
-                return annotation.__args__[0].__name__
-            return annotation.__name__
-
-        def _json_type(name: str) -> str:
-            types_map = {
-                "str": "string",
-                "float": "number",
-                "int": "number",
-                "bool": "boolean",
-                "dict": "object",
-            }
-            return types_map.get(name, "object")
-
         for key in actions:
             action_fn = actions[key]
 
-            if isinstance(action_fn, type):
-                assert issubclass(action_fn, BaseHandler)
+            if isinstance(action_fn, BaseHandler):
                 parameters = action_fn.get_params_jsonschema()
                 description = action_fn.get_description()
             else:
