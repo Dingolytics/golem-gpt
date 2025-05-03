@@ -33,23 +33,23 @@ def main():
     memory.load(job_key)
     goals = memory.goals
 
-    goals = [
-        "Get weather in Batumi, Georgia. Use Celsius. "
-        "Save results in human readable format."
-    ]
-
     # goals = [
-    #     "Get best offers for dedicated servers in the USA, need at least 1 Tb "
-    #     "of storage and 1 Gbps of bandwidth. Save results in human readable format."
+    #     "Get weather in Batumi, Georgia. Use Celsius. "
+    #     "Save results in human readable format."
     # ]
 
     goals = [
-        "Get the price for LEGO collection 75342 (Star Wars). "
-        "Verify the offers found via search are valid. "
-        "Real numbers needed, not just links to websites. "
-        "Skip unavailable resources. "
-        "Summarize results in human readable format with pricing details in a single file."
+        "Get best offers for dedicated servers in the USA, need at least 1 Tb "
+        "of storage and 1 Gbps of bandwidth. Save results in human readable format."
     ]
+
+    # goals = [
+    #     "Get the price for LEGO collection 75342 (Star Wars). "
+    #     "Verify the offers found via search are valid. "
+    #     "Real numbers needed, not just links to websites. "
+    #     "Skip unavailable resources. "
+    #     "Summarize results in human readable format with pricing details in a single file."
+    # ]
 
     # goals = [
     #     "Find funny chess meme images about, use some creativity "
